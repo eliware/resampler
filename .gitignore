@@ -139,4 +139,4 @@ dist
 .jest.result
 
 # output samples
-output*.s16le
+output*.s16le.agentx*
