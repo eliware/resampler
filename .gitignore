@@ -140,3 +140,4 @@ dist
 
 # output samples
 output*.s16le.agentx*
+.agentx*
