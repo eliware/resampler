@@ -12,7 +12,6 @@
 - [Installation](#installation)
 - [Usage](#usage)
   - [ESM Example](#esm-example)
-  - [CommonJS Example](#commonjs-example)
 - [API](#api)
 - [TypeScript](#typescript)
 - [License](#license)
@@ -55,24 +54,6 @@ fs.createReadStream('input-48k-stereo.s16le')
   .pipe(fs.createWriteStream('output-24k-mono-quiet.s16le'));
 ```
 
-### CommonJS Example
-
-```js
-const { Resampler } = require('@eliware/resampler');
-const fs = require('fs');
-
-// Upsample 24kHz mono to 48kHz stereo
-const resampler = new Resampler({ inRate: 24000, outRate: 48000, inChannels: 1, outChannels: 2 });
-fs.createReadStream('input-24k-mono.s16le')
-  .pipe(resampler)
-  .pipe(fs.createWriteStream('output-48k-stereo.s16le'));
-
-// Upsample with lower volume
-const resamplerQuiet = new Resampler({ inRate: 24000, outRate: 48000, inChannels: 1, outChannels: 2, volume: 0.2 });
-fs.createReadStream('input-24k-mono.s16le')
-  .pipe(resamplerQuiet)
-  .pipe(fs.createWriteStream('output-48k-stereo-quiet.s16le'));
-```
 
 ## API
 
