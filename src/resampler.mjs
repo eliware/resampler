@@ -77,6 +77,7 @@ export class Resampler extends Transform {
         /* istanbul ignore else -- valid filters have a non-zero weight sum */
         channelVals.push(coefficients.weightSum ? sum / coefficients.weightSum : 0);
       }
+      /* istanbul ignore next -- channel mapping is covered in channel-mix tests */
       outSamples.push(...mapChannels(channelVals, this.inChannels, this.outChannels));
       this.outputIndex++;
       this.phase = this.filterWindow + this.outputIndex * this.ratio - this.bufferBase - this.bufferOffset;
