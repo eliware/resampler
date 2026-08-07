@@ -161,3 +161,14 @@ test('attenuates frequencies above the downsampling Nyquist limit', async () => 
   for (let i = 32; i < outBuf.length / 2 - 32; i++) peak = Math.max(peak, Math.abs(outBuf.readInt16LE(i * 2)));
   expect(peak).toBeLessThan(1200);
 });
+
+test.each([
+  [48000, 24000, 4993],
+  [24000, 48000, 19969],
+  [44100, 48000, 10867],
+  [48000, 44100, 9173],
+])('emits the expected frame count for %sHz to %sHz', async (inRate, outRate, expectedFrames) => {
+  const input = Buffer.alloc(2 * 10000);
+  const output = await collect(new Resampler({ inRate, outRate }).end(input));
+  expect(output.length).toBe(expectedFrames * 2);
+});
