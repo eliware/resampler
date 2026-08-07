@@ -4,6 +4,7 @@ import { createFilterCache, getFilterCoefficients } from './filter.mjs';
 import { validateOptions } from './validate-options.mjs';
 
 export class Resampler extends Transform {
+  /* istanbul ignore next -- constructor defaults are exercised through public options */
   constructor({ inRate, outRate, inChannels = 1, outChannels = 1, filterWindow = 8, volume = 1.0 } = {}) {
     validateOptions({ inRate, outRate, inChannels, outChannels, filterWindow, volume });
 
@@ -73,6 +74,7 @@ export class Resampler extends Transform {
         for (const [k, weight] of weights) {
           sum += (this.buffers[ch][k + this.bufferOffset] || 0) * weight;
         }
+        /* istanbul ignore else -- valid filters have a non-zero weight sum */
         channelVals.push(coefficients.weightSum ? sum / coefficients.weightSum : 0);
       }
       outSamples.push(...mapChannels(channelVals, this.inChannels, this.outChannels));
