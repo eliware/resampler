@@ -99,3 +99,28 @@ test('uses an anti-alias cutoff when downsampling', () => {
   expect(downsampler.cutoff).toBe(0.5);
   expect(upsampler.cutoff).toBe(1);
 });
+
+test('preserves DC level through resampling', async () => {
+  const input = Buffer.alloc(2 * 256);
+  for (let i = 0; i < 256; i++) input.writeInt16LE(10000, i * 2);
+  const resampler = new Resampler({ inRate: 48000, outRate: 24000 });
+  const outBuf = await collect(resampler.end(input));
+  const values = [];
+  for (let i = 16; i < outBuf.length / 2 - 16; i++) values.push(outBuf.readInt16LE(i * 2));
+  const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+  expect(mean).toBeGreaterThan(9900);
+  expect(mean).toBeLessThan(10100);
+});
+
+test('attenuates frequencies above the downsampling Nyquist limit', async () => {
+  const input = Buffer.alloc(2 * 2048);
+  for (let i = 0; i < 2048; i++) {
+    const sample = Math.round(Math.sin(2 * Math.PI * 18000 * i / 48000) * 12000);
+    input.writeInt16LE(sample, i * 2);
+  }
+  const resampler = new Resampler({ inRate: 48000, outRate: 24000 });
+  const outBuf = await collect(resampler.end(input));
+  let peak = 0;
+  for (let i = 32; i < outBuf.length / 2 - 32; i++) peak = Math.max(peak, Math.abs(outBuf.readInt16LE(i * 2)));
+  expect(peak).toBeLessThan(1200);
+});
