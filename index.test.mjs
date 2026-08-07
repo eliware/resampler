@@ -56,6 +56,25 @@ test('volume option reduces amplitude', async () => {
 });
 
 
+test('produces identical output regardless of input chunk boundaries', async () => {
+  const input = Buffer.alloc(2 * 4096);
+  for (let i = 0; i < 4096; i++) input.writeInt16LE(Math.round(Math.sin(i / 17) * 12000), i * 2);
+
+  const options = { inRate: 44100, outRate: 48000 };
+  const oneChunk = await collect(new Resampler(options).end(input));
+
+  const resampler = new Resampler(options);
+  const split = collect(resampler);
+  resampler.write(input.subarray(0, 1));
+  resampler.write(input.subarray(1, 257));
+  resampler.write(input.subarray(257, 8193));
+  resampler.end(input.subarray(8193));
+  const manyChunks = await split;
+
+  expect(manyChunks).toEqual(oneChunk);
+});
+
+
 test('handles chunks split at arbitrary byte boundaries', async () => {
   const input = Buffer.alloc(2 * 32);
   for (let i = 0; i < 32; i++) input.writeInt16LE(i * 100, i * 2);
