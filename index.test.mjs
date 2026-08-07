@@ -56,6 +56,24 @@ test('volume option reduces amplitude', async () => {
 });
 
 
+test('keeps chunked output stable for high upsampling ratios', async () => {
+  const input = Buffer.alloc(2 * 10000);
+  for (let i = 0; i < 10000; i++) input.writeInt16LE((i * 37) % 20000 - 10000, i * 2);
+
+  const options = { inRate: 8000, outRate: 48000 };
+  const oneChunk = await collect(new Resampler(options).end(input));
+
+  const resampler = new Resampler(options);
+  const split = collect(resampler);
+  resampler.write(input.subarray(0, 1));
+  resampler.write(input.subarray(1, 7777));
+  resampler.end(input.subarray(7777));
+  const manyChunks = await split;
+
+  expect(manyChunks).toEqual(oneChunk);
+});
+
+
 test('produces identical output regardless of input chunk boundaries', async () => {
   const input = Buffer.alloc(2 * 4096);
   for (let i = 0; i < 4096; i++) input.writeInt16LE(Math.round(Math.sin(i / 17) * 12000), i * 2);
