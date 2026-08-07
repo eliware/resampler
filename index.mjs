@@ -125,7 +125,11 @@ export class Resampler extends Transform {
     this.buffers.forEach(buf => {
       for (let i = 0; i < pad; i++) buf.push(0);
     });
-    this._transform(Buffer.alloc(0), 'buffer', () => { });
-    callback();
+
+    try {
+      this._transform(Buffer.alloc(0), 'buffer', callback);
+    } catch (error) {
+      callback(error);
+    }
   }
 }
