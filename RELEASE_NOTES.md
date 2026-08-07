@@ -17,11 +17,12 @@
 
 ### Verification
 
-- Jest: 33 tests passed.
+- Jest: 45 tests passed.
 - Coverage: 100% statements, branches, functions, and lines.
 - Oxlint: 0 warnings/errors.
 - TypeScript declaration check: passed.
-- npm package dry run: passed.
+- Coverage gap check (`npm run test:gaps`): passed.
+- npm package dry run (`npm run pack`): passed.
 
 ## 1.1.1 — December 9, 2025
 
