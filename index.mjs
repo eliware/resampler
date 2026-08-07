@@ -1,5 +1,8 @@
 import { Transform } from 'stream';
 
+const MAX_SAMPLE_RATE = 1_000_000;
+const MAX_FILTER_WINDOW = 4096;
+
 function sinc(x) {
   if (x === 0) return 1;
   return Math.sin(Math.PI * x) / (Math.PI * x);
@@ -11,11 +14,11 @@ function lanczosWindow(x, a) {
 
 export class Resampler extends Transform {
   constructor({ inRate, outRate, inChannels = 1, outChannels = 1, filterWindow = 8, volume = 1.0 } = {}) {
-    if (!Number.isFinite(inRate) || inRate <= 0) {
-      throw new TypeError('inRate must be a finite number greater than 0');
+    if (!Number.isFinite(inRate) || inRate <= 0 || inRate > MAX_SAMPLE_RATE) {
+      throw new TypeError('inRate must be a finite number greater than 0 and at most 1000000');
     }
-    if (!Number.isFinite(outRate) || outRate <= 0) {
-      throw new TypeError('outRate must be a finite number greater than 0');
+    if (!Number.isFinite(outRate) || outRate <= 0 || outRate > MAX_SAMPLE_RATE) {
+      throw new TypeError('outRate must be a finite number greater than 0 and at most 1000000');
     }
     if (!Number.isInteger(inChannels) || ![1, 2].includes(inChannels)) {
       throw new TypeError('inChannels must be 1 or 2');
@@ -23,8 +26,8 @@ export class Resampler extends Transform {
     if (!Number.isInteger(outChannels) || ![1, 2].includes(outChannels)) {
       throw new TypeError('outChannels must be 1 or 2');
     }
-    if (!Number.isInteger(filterWindow) || filterWindow <= 0) {
-      throw new TypeError('filterWindow must be a positive integer');
+    if (!Number.isInteger(filterWindow) || filterWindow <= 0 || filterWindow > MAX_FILTER_WINDOW) {
+      throw new TypeError('filterWindow must be a positive integer at most 4096');
     }
     if (!Number.isFinite(volume)) {
       throw new TypeError('volume must be a finite number');

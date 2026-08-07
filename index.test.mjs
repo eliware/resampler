@@ -124,6 +124,9 @@ test.each([
   ['inChannels', { inRate: 24000, outRate: 24000, inChannels: 3 }],
   ['outChannels', { inRate: 24000, outRate: 24000, outChannels: 0 }],
   ['filterWindow', { inRate: 24000, outRate: 24000, filterWindow: 2.5 }],
+  ['filterWindowLimit', { inRate: 24000, outRate: 24000, filterWindow: 4097 }],
+  ['inRateLimit', { inRate: 1000001, outRate: 24000 }],
+  ['outRateLimit', { inRate: 24000, outRate: 1000001 }],
   ['volume', { inRate: 24000, outRate: 24000, volume: NaN }],
 ])('rejects invalid %s', (_, options) => {
   expect(() => new Resampler(options)).toThrow(TypeError);
