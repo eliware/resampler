@@ -45,6 +45,7 @@ export class Resampler extends Transform {
     this.bufferOffset = 0;
     this.volume = volume;
     this.pending = Buffer.alloc(0);
+    this.coefficientCache = new Map();
   }
 
   _transform(chunk, encoding, callback) {
@@ -75,14 +76,24 @@ export class Resampler extends Transform {
     while (this.phase + this.filterWindow <= this.buffers[0].length - this.bufferOffset + Number.EPSILON) {
       const pos = this.phase;
       const i0 = Math.floor(pos);
-      weights.length = 0;
-      let weightSum = 0;
-      for (let k = i0 - this.filterWindow + 1; k <= i0 + this.filterWindow; k++) {
-        const x = pos - k;
-        const weight = this.cutoff * sinc(this.cutoff * x) * lanczosWindow(x, this.filterWindow);
-        weights.push([k, weight]);
-        weightSum += weight;
+      const fraction = pos - i0;
+      const cacheKey = fraction.toString();
+      let coefficients = this.coefficientCache.get(cacheKey);
+      if (!coefficients) {
+        coefficients = [];
+        let weightSum = 0;
+        for (let offset = -this.filterWindow + 1; offset <= this.filterWindow; offset++) {
+          const x = fraction - offset;
+          const weight = this.cutoff * sinc(this.cutoff * x) * lanczosWindow(x, this.filterWindow);
+          coefficients.push([offset, weight]);
+          weightSum += weight;
+        }
+        coefficients.weightSum = weightSum;
+        if (this.coefficientCache.size < 4096) this.coefficientCache.set(cacheKey, coefficients);
       }
+      weights.length = 0;
+      for (const [offset, weight] of coefficients) weights.push([i0 + offset, weight]);
+      const weightSum = coefficients.weightSum;
 
       const channelVals = [];
       for (let ch = 0; ch < this.inChannels; ch++) {
