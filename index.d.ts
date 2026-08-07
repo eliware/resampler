@@ -9,9 +9,9 @@ export interface ResamplerOptions {
   /** Output sample rate; finite and greater than 0 (e.g. 24000) */
   outRate: number;
   /** Number of input channels (default: 1) */
-  inChannels?: number;
+  inChannels?: 1 | 2;
   /** Number of output channels (default: 1) */
-  outChannels?: number;
+  outChannels?: 1 | 2;
   /** Positive integer filter window size for sinc interpolation (default: 8) */
   filterWindow?: number;
   /** Finite output volume multiplier (default: 1.0) */
