@@ -78,6 +78,10 @@ const resampler = new Resampler({ inRate: 48000, outRate: 24000, inChannels: 2, 
 
 Input must contain complete s16le PCM frames. Incomplete frames split across stream chunks are buffered; an incomplete final frame emits an error.
 
+#### Filter latency and output length
+
+The sinc filter introduces edge latency. Output begins after enough input is available for the configured filter window, and the stream flush pads the input with `filterWindow` zero samples to emit the available tail. Consequently, output length includes the filter's edge behavior and may differ slightly from the simple `inputFrames * outRate / inRate` estimate. For exact framing, treat the emitted stream length as authoritative.
+
 Pipe PCM data through the resampler:
 
 ```js
