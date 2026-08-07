@@ -17,3 +17,5 @@ Five-run median timings with cached coefficients, on the local development host:
 | 24k -> 48k | 8 | 51.79 ms | 50.70 ms | 52.69 ms | yes |
 
 Results are host-dependent. Re-run before making performance decisions.
+
+Decision: keep the bounded cache. It improves the common `filterWindow: 8` and larger-window cases in these runs; `filterWindow: 4` is noisier and may be slower. Revisit if profiling shows small-window workloads dominate.
