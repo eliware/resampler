@@ -11,7 +11,11 @@
 - `src/filter.mjs`: sinc/Lanczos coefficients and bounded coefficient cache.
 - `src/channel-mix.mjs`: mono/stereo channel mapping.
 - `src/validate-options.mjs`: constructor option validation.
-- `index.test.mjs`: integration and DSP behavior tests.
+- `tests/index.test.mjs`: public entry-point integration tests.
+- `tests/resampler.test.mjs`: Transform stream, PCM buffering, and resampling behavior tests.
+- `tests/filter.test.mjs`: filter coefficient and cache tests.
+- `tests/channel-mix.test.mjs`: mono/stereo channel mapping tests.
+- `tests/validate-options.test.mjs`: constructor option validation tests.
 - `typecheck.mts`: TypeScript declaration smoke test.
 - `benchmark.mjs`: repeatable performance benchmark.
 
@@ -23,7 +27,8 @@ Use focused validation during changes:
 npm test
 npm run typecheck
 npm run lint
-npm pack --dry-run
+npm run test:gaps
+npm run pack
 ```
 
 Benchmark streaming workloads:
