@@ -2,7 +2,6 @@ import { test, expect } from '@jest/globals';
 import fs from 'fs';
 import path from 'path';
 import { Resampler } from '../index.mjs';
-import { createFilterCache, getFilterCoefficients } from '../src/filter.mjs';
 
 function collect(stream) {
   return new Promise((resolve, reject) => {
