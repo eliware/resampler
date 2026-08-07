@@ -172,3 +172,21 @@ test.each([
   const output = await collect(new Resampler({ inRate, outRate }).end(input));
   expect(output.length).toBe(expectedFrames * 2);
 });
+
+test('emits no samples for empty input', async () => {
+  const output = await collect(new Resampler({ inRate: 48000, outRate: 24000 }).end());
+  expect(output).toHaveLength(0);
+});
+
+test('handles input shorter than the filter window', async () => {
+  const input = Buffer.alloc(2 * 4);
+  const output = await collect(new Resampler({ inRate: 48000, outRate: 24000 }).end(input));
+  expect(output).toHaveLength(0);
+});
+
+test('rejects incomplete stereo frames', async () => {
+  const resampler = new Resampler({ inRate: 48000, outRate: 24000, inChannels: 2 });
+  const error = new Promise(resolve => resampler.once('error', resolve));
+  resampler.end(Buffer.alloc(3));
+  await expect(error).resolves.toBeInstanceOf(Error);
+});
