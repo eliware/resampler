@@ -1,64 +1,64 @@
 {
-  "name": "@eliware/resampler",
-  "type": "module",
-  "version": "1.1.1",
-  "description": "A pure JavaScript, high-quality PCM audio resampler for Node.js. Converts s16le PCM between arbitrary sample rates and channel layouts (mono/stereo) with windowed-sinc filtering.",
-  "main": "index.mjs",
-  "types": "index.d.ts",
-  "files": [
-    "index.mjs",
-    "src",
-    "index.d.ts",
-    "README.md",
-    "LICENSE"
-  ],
-  "exports": {
-    ".": {
-      "types": "./index.d.ts",
-      "import": "./index.mjs"
+    "name": "@eliware/resampler",
+    "type": "module",
+    "version": "1.1.2",
+    "description": "A pure JavaScript, high-quality PCM audio resampler for Node.js. Converts s16le PCM between arbitrary sample rates and channel layouts (mono/stereo) with windowed-sinc filtering.",
+    "main": "index.mjs",
+    "types": "index.d.ts",
+    "files": [
+        "index.mjs",
+        "src",
+        "index.d.ts",
+        "README.md",
+        "LICENSE"
+    ],
+    "exports": {
+        ".": {
+            "types": "./index.d.ts",
+            "import": "./index.mjs"
+        }
+    },
+    "scripts": {
+        "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent --coverage",
+        "test:gaps": "npm test 2>&1 | grep '|' | grep -vF '|     100 |     100 |     100 |     100 |'",
+        "lint": "npx oxlint .",
+        "benchmark": "node benchmark.mjs",
+        "typecheck": "tsc --project tsconfig.json",
+        "pack": "npm pack --dry-run"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/eliware/resampler.git"
+    },
+    "keywords": [
+        "resampler",
+        "pcm",
+        "audio",
+        "s16le",
+        "sample-rate",
+        "windowed-sinc",
+        "nodejs",
+        "stereo",
+        "mono",
+        "pure-js",
+        "audio-processing",
+        "volume-control"
+    ],
+    "author": "Eli Sterling, eliware.org <eli@eliware.org>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/eliware/resampler/issues"
+    },
+    "homepage": "https://github.com/eliware/resampler#readme",
+    "devDependencies": {
+        "jest": "^30.4.2",
+        "typescript": "^7.0.2"
+    },
+    "jest": {
+        "testEnvironment": "node",
+        "testMatch": [
+            "**/?(*.)+(spec|test).[jt]s?(x)",
+            "**/?(*.)+(spec|test).mjs"
+        ]
     }
-  },
-  "scripts": {
-    "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent --coverage",
-    "test:gaps": "npm test 2>&1 | grep '|' | grep -vF '|     100 |     100 |     100 |     100 |'",
-    "lint": "npx oxlint .",
-    "benchmark": "node benchmark.mjs",
-    "typecheck": "tsc --project tsconfig.json",
-    "pack": "npm pack --dry-run"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/eliware/resampler.git"
-  },
-  "keywords": [
-    "resampler",
-    "pcm",
-    "audio",
-    "s16le",
-    "sample-rate",
-    "windowed-sinc",
-    "nodejs",
-    "stereo",
-    "mono",
-    "pure-js",
-    "audio-processing",
-    "volume-control"
-  ],
-  "author": "Eli Sterling, eliware.org <eli@eliware.org>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/eliware/resampler/issues"
-  },
-  "homepage": "https://github.com/eliware/resampler#readme",
-  "devDependencies": {
-    "jest": "^30.4.2",
-    "typescript": "^7.0.2"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/?(*.)+(spec|test).[jt]s?(x)",
-      "**/?(*.)+(spec|test).mjs"
-    ]
-  }
 }
