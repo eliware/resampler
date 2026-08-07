@@ -19,3 +19,5 @@ Five-run median timings with cached coefficients, on the local development host:
 Results are host-dependent. Re-run before making performance decisions.
 
 Decision: keep the bounded cache. It improves the common `filterWindow: 8` and larger-window cases in these runs; `filterWindow: 4` is noisier and may be slower. Revisit if profiling shows small-window workloads dominate.
+
+Polyphase filtering is deferred. The bounded fractional-phase coefficient cache provides part of the same reuse without changing filter output or adding a fixed phase quantization error. Reconsider if profiling identifies coefficient generation as the dominant cost.
