@@ -37,6 +37,7 @@ export class Resampler extends Transform {
     this.outChannels = outChannels;
     this.filterWindow = filterWindow;
     this.ratio = inRate / outRate;
+    this.cutoff = Math.min(1, outRate / inRate);
     this.phase = filterWindow;
     this.buffers = Array.from({ length: inChannels }, () => []);
     this.volume = volume;
@@ -70,15 +71,22 @@ export class Resampler extends Transform {
     while (this.phase + this.filterWindow <= this.buffers[0].length) {
       const pos = this.phase;
       const i0 = Math.floor(pos);
+      const weights = [];
+      let weightSum = 0;
+      for (let k = i0 - this.filterWindow + 1; k <= i0 + this.filterWindow; k++) {
+        const x = pos - k;
+        const weight = this.cutoff * sinc(this.cutoff * x) * lanczosWindow(x, this.filterWindow);
+        weights.push([k, weight]);
+        weightSum += weight;
+      }
+
       const channelVals = [];
       for (let ch = 0; ch < this.inChannels; ch++) {
         let sum = 0;
-        for (let k = i0 - this.filterWindow + 1; k <= i0 + this.filterWindow; k++) {
-          const x = pos - k;
-          const bufVal = this.buffers[ch][k] || 0;
-          sum += bufVal * sinc(x) * lanczosWindow(x, this.filterWindow);
+        for (const [k, weight] of weights) {
+          sum += (this.buffers[ch][k] || 0) * weight;
         }
-        channelVals.push(sum);
+        channelVals.push(weightSum ? sum / weightSum : 0);
       }
       if (this.inChannels === 2 && this.outChannels === 1) {
         outSamples.push((channelVals[0] + channelVals[1]) / 2);

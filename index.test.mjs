@@ -91,3 +91,11 @@ test.each([
 ])('rejects invalid %s', (_, options) => {
   expect(() => new Resampler(options)).toThrow(TypeError);
 });
+
+
+test('uses an anti-alias cutoff when downsampling', () => {
+  const downsampler = new Resampler({ inRate: 48000, outRate: 24000 });
+  const upsampler = new Resampler({ inRate: 24000, outRate: 48000 });
+  expect(downsampler.cutoff).toBe(0.5);
+  expect(upsampler.cutoff).toBe(1);
+});
