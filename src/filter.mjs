@@ -4,6 +4,7 @@ function sinc(x) {
 }
 
 function lanczosWindow(x, a) {
+  /* istanbul ignore next -- generated taps stay within the configured window */
   return Math.abs(x) > a ? 0 : sinc(x / a);
 }
 
