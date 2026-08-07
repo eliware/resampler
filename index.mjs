@@ -21,11 +21,25 @@ export class Resampler extends Transform {
     this.phase = filterWindow;
     this.buffers = Array.from({ length: inChannels }, () => []);
     this.volume = volume;
+    this.pending = Buffer.alloc(0);
   }
 
   _transform(chunk, encoding, callback) {
-    const view = new DataView(chunk.buffer, chunk.byteOffset, chunk.byteLength);
-    const samples = chunk.length / 2 / this.inChannels;
+    if (chunk.length) {
+      this.pending = this.pending.length ? Buffer.concat([this.pending, chunk]) : chunk;
+    }
+
+    const frameBytes = 2 * this.inChannels;
+    const completeBytes = this.pending.length - (this.pending.length % frameBytes);
+    if (completeBytes === 0) {
+      callback();
+      return;
+    }
+
+    const input = this.pending.subarray(0, completeBytes);
+    this.pending = this.pending.subarray(completeBytes);
+    const view = new DataView(input.buffer, input.byteOffset, input.byteLength);
+    const samples = completeBytes / frameBytes;
     for (let i = 0; i < samples; i++) {
       for (let ch = 0; ch < this.inChannels; ch++) {
         const val = view.getInt16((i * this.inChannels + ch) * 2, true);
@@ -75,6 +89,11 @@ export class Resampler extends Transform {
   }
 
   _flush(callback) {
+    if (this.pending.length) {
+      callback(new Error('Input ended with an incomplete PCM frame'));
+      return;
+    }
+
     const pad = this.filterWindow;
     this.buffers.forEach(buf => {
       for (let i = 0; i < pad; i++) buf.push(0);

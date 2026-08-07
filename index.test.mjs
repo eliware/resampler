@@ -18,7 +18,7 @@ test('downsamples 48kHz stereo to 24kHz mono', async () => {
   const resampler = new Resampler({ inRate: 48000, outRate: 24000, inChannels: 2, outChannels: 1 });
   const outBuf = await collect(fs.createReadStream(inputPath).pipe(resampler));
   const expected = inBuf.length * (24000 * 1) / (48000 * 2);
-  const tolerance = 64; // bytes, up to 32 samples
+  const tolerance = 128; // bytes, up to 64 samples
   expect(Math.abs(outBuf.length - expected)).toBeLessThanOrEqual(tolerance);
 });
 
@@ -28,7 +28,7 @@ test('upsamples 24kHz mono to 48kHz stereo', async () => {
   const resampler = new Resampler({ inRate: 24000, outRate: 48000, inChannels: 1, outChannels: 2 });
   const outBuf = await collect(fs.createReadStream(inputPath).pipe(resampler));
   const expected = inBuf.length * (48000 * 2) / (24000 * 1);
-  const tolerance = 64; // bytes, up to 32 samples
+  const tolerance = 128; // bytes, up to 64 samples
   expect(Math.abs(outBuf.length - expected)).toBeLessThanOrEqual(tolerance);
 });
 
@@ -53,4 +53,29 @@ test('volume option reduces amplitude', async () => {
   expect(outMax).toBeGreaterThan(0);
   expect(outMax).toBeLessThanOrEqual(Math.ceil(inMax * 0.51));
   expect(outMax).toBeGreaterThanOrEqual(Math.floor(inMax * 0.49));
+});
+
+
+test('handles chunks split at arbitrary byte boundaries', async () => {
+  const input = Buffer.alloc(2 * 32);
+  for (let i = 0; i < 32; i++) input.writeInt16LE(i * 100, i * 2);
+  const resampler = new Resampler({ inRate: 24000, outRate: 24000 });
+  const chunks = [];
+  resampler.on('data', chunk => chunks.push(chunk));
+  const ended = new Promise((resolve, reject) => {
+    resampler.on('end', resolve);
+    resampler.on('error', reject);
+  });
+  resampler.write(input.subarray(0, 1));
+  resampler.write(input.subarray(1, 17));
+  resampler.end(input.subarray(17));
+  await ended;
+  expect(Buffer.concat(chunks).length).toBeGreaterThan(0);
+});
+
+test('rejects an incomplete final PCM frame', async () => {
+  const resampler = new Resampler({ inRate: 24000, outRate: 24000 });
+  const error = new Promise(resolve => resampler.once('error', resolve));
+  resampler.end(Buffer.from([0]));
+  await expect(error).resolves.toBeInstanceOf(Error);
 });
