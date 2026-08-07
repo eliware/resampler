@@ -3,6 +3,7 @@ import { Resampler } from './index.mjs';
 
 const frames = Number(process.argv[2] ?? 48000 * 10);
 const repeats = Number(process.argv[3] ?? 5);
+const chunkFrames = Number(process.argv[4] ?? frames);
 const input = Buffer.alloc(frames * 2);
 for (let i = 0; i < frames; i++) input.writeInt16LE(Math.sin(i / 17) * 12000, i * 2);
 
@@ -22,7 +23,15 @@ for (const [inRate, outRate, filterWindow] of cases) {
     const resampler = new Resampler({ inRate, outRate, filterWindow });
     const chunks = [];
     resampler.on('data', chunk => chunks.push(chunk));
-    resampler.end(input);
+    if (chunkFrames >= frames) {
+      resampler.end(input);
+    } else {
+      for (let offset = 0; offset < frames; offset += chunkFrames) {
+        const end = Math.min(offset + chunkFrames, frames);
+        resampler.write(input.subarray(offset * 2, end * 2));
+      }
+      resampler.end();
+    }
     await once(resampler, 'end');
     timings.push(Number(process.hrtime.bigint() - start) / 1e6);
     outputBytes = Buffer.concat(chunks).length;
@@ -34,6 +43,7 @@ for (const [inRate, outRate, filterWindow] of cases) {
   console.log(JSON.stringify({
     frames,
     repeats,
+    chunkFrames,
     inRate,
     outRate,
     filterWindow,
