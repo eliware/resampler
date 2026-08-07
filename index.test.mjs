@@ -240,3 +240,16 @@ test('covers filter coefficient edge branches', () => {
   expect(uncached.hit).toBe(false);
   expect(cache.size).toBe(4096);
 });
+
+test('propagates errors thrown while flushing', async () => {
+  class FailingResampler extends Resampler {
+    _transform() {
+      throw new Error('flush failure');
+    }
+  }
+
+  const resampler = new FailingResampler({ inRate: 24000, outRate: 24000 });
+  const error = new Promise(resolve => resampler.once('error', resolve));
+  resampler.end();
+  await expect(error).resolves.toThrow('flush failure');
+});
