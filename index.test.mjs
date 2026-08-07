@@ -190,3 +190,34 @@ test('rejects incomplete stereo frames', async () => {
   resampler.end(Buffer.alloc(3));
   await expect(error).resolves.toBeInstanceOf(Error);
 });
+
+test.each([
+  [1, 1],
+  [1, 2],
+  [2, 1],
+  [2, 2],
+])('supports %s input channel(s) to %s output channel(s)', async (inChannels, outChannels) => {
+  const frames = 64;
+  const input = Buffer.alloc(frames * inChannels * 2);
+  for (let i = 0; i < frames; i++) {
+    for (let ch = 0; ch < inChannels; ch++) input.writeInt16LE((i + 1) * (ch + 1) * 100, (i * inChannels + ch) * 2);
+  }
+  const output = await collect(new Resampler({
+    inRate: 24000,
+    outRate: 24000,
+    inChannels,
+    outChannels,
+  }).end(input));
+  expect(output.length % (outChannels * 2)).toBe(0);
+  expect(output.length).toBeGreaterThan(0);
+});
+
+test('volume zero produces silence', async () => {
+  const input = Buffer.alloc(2 * 128, 0x7f);
+  const output = await collect(new Resampler({
+    inRate: 24000,
+    outRate: 24000,
+    volume: 0,
+  }).end(input));
+  expect(output.every(byte => byte === 0)).toBe(true);
+});
