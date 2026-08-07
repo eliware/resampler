@@ -1,5 +1,12 @@
 # Release Notes
 
+## 1.1.3 — August 7, 2026
+
+- Aligned package metadata, published files, CI, documentation, examples, and validation with Eliware library conventions.
+- Removed legacy `main` metadata and excluded tests from the published package.
+- Standardized coverage-gap validation and expanded CI checks.
+- Verification: 45 tests, 100% coverage, gap check, lint, typecheck, pack, benchmark, smoke test, and production audit pass.
+
 ## 1.1.2 — August 7, 2026
 
 - Refactored the resampler into focused ESM modules for validation, filtering, channel mapping, and stream processing.
