@@ -39,6 +39,8 @@ export class Resampler extends Transform {
     this.ratio = inRate / outRate;
     this.cutoff = Math.min(1, outRate / inRate);
     this.phase = filterWindow;
+    this.outputIndex = 0;
+    this.bufferBase = 0;
     this.buffers = Array.from({ length: inChannels }, () => []);
     this.bufferOffset = 0;
     this.volume = volume;
@@ -69,7 +71,7 @@ export class Resampler extends Transform {
     }
 
     const outSamples = [];
-    while (this.phase + this.filterWindow <= this.buffers[0].length - this.bufferOffset) {
+    while (this.phase + this.filterWindow <= this.buffers[0].length - this.bufferOffset + Number.EPSILON) {
       const pos = this.phase;
       const i0 = Math.floor(pos);
       const weights = [];
@@ -97,7 +99,8 @@ export class Resampler extends Transform {
         outSamples.push(...channelVals.slice(0, this.outChannels));
       }
 
-      this.phase += this.ratio;
+      this.outputIndex++;
+      this.phase = this.filterWindow + this.outputIndex * this.ratio - this.bufferBase - this.bufferOffset;
     }
 
     const drop = Math.floor(this.phase) - this.filterWindow;
@@ -106,7 +109,9 @@ export class Resampler extends Transform {
       this.phase -= drop;
       if (this.bufferOffset >= 4096) {
         this.buffers = this.buffers.map(buf => buf.slice(this.bufferOffset));
+        this.bufferBase += this.bufferOffset;
         this.bufferOffset = 0;
+        this.phase = this.filterWindow + this.outputIndex * this.ratio - this.bufferBase;
       }
     }
 
