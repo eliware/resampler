@@ -68,7 +68,7 @@ Creates a Transform stream that resamples s16le PCM audio.
 - `inChannels` (number, default 1): Number of input channels (1=mono, 2=stereo)
 - `outChannels` (number, default 1): Number of output channels (1=mono, 2=stereo)
 - `filterWindow` (number, default 8): Positive integer sinc filter window size (higher = better quality, more CPU)
-- `volume` (number, default 1.0): Finite output volume multiplier (0.0 = silence, 1.0 = unchanged, >1.0 = amplify)
+- `volume` (number, default 1.0): Finite output volume multiplier (0.0 = silence, 1.0 = unchanged, >1.0 = amplify, negative = polarity inversion)
 
 #### Example
 

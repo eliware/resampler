@@ -14,7 +14,7 @@ export interface ResamplerOptions {
   outChannels?: 1 | 2;
   /** Positive integer filter window size for sinc interpolation (default: 8) */
   filterWindow?: number;
-  /** Finite output volume multiplier (default: 1.0) */
+  /** Finite output volume multiplier (default: 1.0); negative values invert polarity */
   volume?: number;
 }
 
