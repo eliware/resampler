@@ -27,6 +27,11 @@
 - Built-in output volume control
 - TypeScript type definitions included
 
+## Requirements
+
+- Node.js 26 or newer
+- s16le PCM input for stream processing
+
 ## Installation
 
 ```bash
@@ -87,6 +92,25 @@ Pipe PCM data through the resampler:
 ```js
 inputStream.pipe(resampler).pipe(outputStream);
 ```
+
+## Errors / Troubleshooting
+
+Options are validated before processing. Supported channel layouts are mono and stereo. Input must contain complete s16le frames; an incomplete final frame emits an error. Filter latency and output length include documented edge behavior.
+
+## Development
+
+```bash
+npm test
+npm run test:gaps
+npm run lint
+npm run typecheck
+npm run pack
+npm run benchmark -- 48000 5 960
+```
+
+## Security
+
+The resampler performs local audio processing and has no network access. Treat input/output paths, file streams, and any audio data as application-controlled resources; validate untrusted paths and avoid exposing sensitive audio in logs or artifacts.
 
 ## TypeScript
 
