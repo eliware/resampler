@@ -71,10 +71,11 @@ export class Resampler extends Transform {
     }
 
     const outSamples = [];
+    const weights = [];
     while (this.phase + this.filterWindow <= this.buffers[0].length - this.bufferOffset + Number.EPSILON) {
       const pos = this.phase;
       const i0 = Math.floor(pos);
-      const weights = [];
+      weights.length = 0;
       let weightSum = 0;
       for (let k = i0 - this.filterWindow + 1; k <= i0 + this.filterWindow; k++) {
         const x = pos - k;
