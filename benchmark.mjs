@@ -18,6 +18,8 @@ const cases = [
 for (const [inRate, outRate, filterWindow] of cases) {
   const timings = [];
   let outputBytes;
+  let cacheHits = 0;
+  let cacheMisses = 0;
   for (let run = 0; run < repeats; run++) {
     const start = process.hrtime.bigint();
     const resampler = new Resampler({ inRate, outRate, filterWindow });
@@ -35,6 +37,8 @@ for (const [inRate, outRate, filterWindow] of cases) {
     await once(resampler, 'end');
     timings.push(Number(process.hrtime.bigint() - start) / 1e6);
     outputBytes = Buffer.concat(chunks).length;
+    cacheHits += resampler.cacheHits;
+    cacheMisses += resampler.cacheMisses;
   }
   timings.sort((a, b) => a - b);
   const medianMs = timings[Math.floor(timings.length / 2)];
@@ -48,6 +52,8 @@ for (const [inRate, outRate, filterWindow] of cases) {
     outRate,
     filterWindow,
     outputBytes,
+    cacheHits,
+    cacheMisses,
     minMs: Number(timings[0].toFixed(2)),
     medianMs: Number(medianMs.toFixed(2)),
     maxMs: Number(timings.at(-1).toFixed(2)),

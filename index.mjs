@@ -46,6 +46,8 @@ export class Resampler extends Transform {
     this.volume = volume;
     this.pending = Buffer.alloc(0);
     this.coefficientCache = new Map();
+    this.cacheHits = 0;
+    this.cacheMisses = 0;
   }
 
   _transform(chunk, encoding, callback) {
@@ -79,7 +81,9 @@ export class Resampler extends Transform {
       const fraction = pos - i0;
       const cacheKey = fraction.toString();
       let coefficients = this.coefficientCache.get(cacheKey);
+      if (coefficients) this.cacheHits++;
       if (!coefficients) {
+        this.cacheMisses++;
         coefficients = [];
         let weightSum = 0;
         for (let offset = -this.filterWindow + 1; offset <= this.filterWindow; offset++) {
