@@ -23,7 +23,8 @@
     "test:gaps": "npm test 2>&1 | grep '|' | grep -vF '|     100 |     100 |     100 |     100 |'",
     "lint": "npx oxlint .",
     "benchmark": "node benchmark.mjs",
-    "typecheck": "tsc --project tsconfig.json"
+    "typecheck": "tsc --project tsconfig.json",
+    "pack": "npm pack --dry-run"
   },
   "repository": {
     "type": "git",
