@@ -1,4 +1,4 @@
-import { jest, test, expect } from '@jest/globals';
+import { test, expect } from '@jest/globals';
 import fs from 'fs';
 import path from 'path';
 import { Resampler } from './index.mjs';
