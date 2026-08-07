@@ -79,3 +79,15 @@ test('rejects an incomplete final PCM frame', async () => {
   resampler.end(Buffer.from([0]));
   await expect(error).resolves.toBeInstanceOf(Error);
 });
+
+
+test.each([
+  ['inRate', { inRate: 0, outRate: 24000 }],
+  ['outRate', { inRate: 24000, outRate: Infinity }],
+  ['inChannels', { inRate: 24000, outRate: 24000, inChannels: 3 }],
+  ['outChannels', { inRate: 24000, outRate: 24000, outChannels: 0 }],
+  ['filterWindow', { inRate: 24000, outRate: 24000, filterWindow: 2.5 }],
+  ['volume', { inRate: 24000, outRate: 24000, volume: NaN }],
+])('rejects invalid %s', (_, options) => {
+  expect(() => new Resampler(options)).toThrow(TypeError);
+});

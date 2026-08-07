@@ -10,7 +10,26 @@ function lanczosWindow(x, a) {
 }
 
 export class Resampler extends Transform {
-  constructor({ inRate, outRate, inChannels = 1, outChannels = 1, filterWindow = 8, volume = 1.0 }) {
+  constructor({ inRate, outRate, inChannels = 1, outChannels = 1, filterWindow = 8, volume = 1.0 } = {}) {
+    if (!Number.isFinite(inRate) || inRate <= 0) {
+      throw new TypeError('inRate must be a finite number greater than 0');
+    }
+    if (!Number.isFinite(outRate) || outRate <= 0) {
+      throw new TypeError('outRate must be a finite number greater than 0');
+    }
+    if (!Number.isInteger(inChannels) || ![1, 2].includes(inChannels)) {
+      throw new TypeError('inChannels must be 1 or 2');
+    }
+    if (!Number.isInteger(outChannels) || ![1, 2].includes(outChannels)) {
+      throw new TypeError('outChannels must be 1 or 2');
+    }
+    if (!Number.isInteger(filterWindow) || filterWindow <= 0) {
+      throw new TypeError('filterWindow must be a positive integer');
+    }
+    if (!Number.isFinite(volume)) {
+      throw new TypeError('volume must be a finite number');
+    }
+
     super();
     this.inRate = inRate;
     this.outRate = outRate;
