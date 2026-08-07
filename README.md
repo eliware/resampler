@@ -19,7 +19,7 @@
 ## Features
 
 - Pure JavaScript, no native dependencies
-- High-quality windowed-sinc resampling
+- High-quality windowed-sinc resampling with anti-alias filtering
 - Arbitrary input/output sample rates (e.g. 48kHz ↔ 24kHz)
 - Channel mixing: stereo→mono (average), mono→stereo (duplicate)
 - Streams API: drop-in replacement for ffmpeg pipes in Node.js
@@ -63,18 +63,20 @@ Creates a Transform stream that resamples s16le PCM audio.
 
 #### Options
 
-- `inRate` (number): Input sample rate (e.g. 48000)
-- `outRate` (number): Output sample rate (e.g. 24000)
+- `inRate` (number): Input sample rate, finite and greater than 0 (e.g. 48000)
+- `outRate` (number): Output sample rate, finite and greater than 0 (e.g. 24000)
 - `inChannels` (number, default 1): Number of input channels (1=mono, 2=stereo)
 - `outChannels` (number, default 1): Number of output channels (1=mono, 2=stereo)
-- `filterWindow` (number, default 8): Sinc filter window size (higher = better quality, more CPU)
-- `volume` (number, default 1.0): Output volume multiplier (0.0 = silence, 1.0 = unchanged, >1.0 = amplify)
+- `filterWindow` (number, default 8): Positive integer sinc filter window size (higher = better quality, more CPU)
+- `volume` (number, default 1.0): Finite output volume multiplier (0.0 = silence, 1.0 = unchanged, >1.0 = amplify)
 
 #### Example
 
 ```js
 const resampler = new Resampler({ inRate: 48000, outRate: 24000, inChannels: 2, outChannels: 1, volume: 0.5 });
 ```
+
+Input must contain complete s16le PCM frames. Incomplete frames split across stream chunks are buffered; an incomplete final frame emits an error.
 
 Pipe PCM data through the resampler:
 

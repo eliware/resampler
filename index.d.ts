@@ -4,17 +4,17 @@ import { Transform } from 'stream';
  * Options for Resampler
  */
 export interface ResamplerOptions {
-  /** Input sample rate (e.g. 48000) */
+  /** Input sample rate; finite and greater than 0 (e.g. 48000) */
   inRate: number;
-  /** Output sample rate (e.g. 24000) */
+  /** Output sample rate; finite and greater than 0 (e.g. 24000) */
   outRate: number;
   /** Number of input channels (default: 1) */
   inChannels?: number;
   /** Number of output channels (default: 1) */
   outChannels?: number;
-  /** Filter window size for the sinc interpolation (default: 8) */
+  /** Positive integer filter window size for sinc interpolation (default: 8) */
   filterWindow?: number;
-  /** Output volume multiplier (default: 1.0, range: 0.0–1.0+) */
+  /** Finite output volume multiplier (default: 1.0) */
   volume?: number;
 }
 
