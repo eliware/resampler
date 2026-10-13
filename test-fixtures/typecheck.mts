@@ -1,4 +1,4 @@
-import { Resampler } from '@eliware/resampler';
+import { Resampler } from "@eliware/resampler";
 
 new Resampler({ inRate: 48_000, outRate: 24_000, inChannels: 1, outChannels: 2 });
 

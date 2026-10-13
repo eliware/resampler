@@ -1,134 +1,85 @@
 # [![eliware.org](https://eliware.org/logos/brand.png)](https://discord.gg/M6aTR9eTwN)
 
-Documentation: [docs](docs/README.md) · [specifications](specs/README.md) · [examples](examples/README.md)
+## @eliware/resampler [![npm](https://img.shields.io/npm/v/@eliware/resampler)](https://www.npmjs.com/package/@eliware/resampler) [![License](https://img.shields.io/github/license/eliware/resampler)](https://github.com/eliware/resampler/blob/main/LICENSE) [![CI](https://github.com/eliware/resampler/actions/workflows/ci.yaml/badge.svg)](https://github.com/eliware/resampler/actions/workflows/ci.yaml)
 
-## @eliware/resampler [![npm version](https://img.shields.io/npm/v/@eliware/resampler.svg)](https://www.npmjs.com/package/@eliware/resampler)[![license](https://img.shields.io/github/license/eliware/resampler.svg)](LICENSE)[![build status](https://github.com/eliware/resampler/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/resampler/actions)
-
-> A pure JavaScript, high-quality PCM audio resampler for Node.js. Converts s16le PCM between arbitrary sample rates and channel layouts (mono/stereo) with windowed-sinc filtering. Includes built-in volume control.
-
----
+A pure JavaScript, high-quality PCM audio resampler for Node.js. Converts s16le PCM between arbitrary sample rates and channel layouts (mono/stereo) with windowed-sinc filtering.
 
 ## Table of Contents
 
 - [Features](#features)
-- [Installation](#installation)
+- [Requirements](#requirements)
+- [Setup](#setup)
 - [Usage](#usage)
-  - [ESM Example](#esm-example)
+- [Development](#development)
+- [Testing](#testing)
+- [Troubleshooting](#troubleshooting)
+- [Security](#security)
 - [API](#api)
-- [TypeScript](#typescript)
+- [Packaging](#packaging)
+- [Examples](#examples)
+- [Support](#support)
+- [Links](#links)
 - [License](#license)
 
 ## Features
 
-- Pure JavaScript, no native dependencies
-- High-quality windowed-sinc resampling with anti-alias filtering
-- Arbitrary input/output sample rates (e.g. 48kHz ↔ 24kHz)
-- Channel mixing: stereo→mono (average), mono→stereo (duplicate)
-- Streams API: drop-in replacement for ffmpeg pipes in Node.js
-- Supports s16le PCM (signed 16-bit little-endian)
-- Built-in output volume control
-- TypeScript type definitions included
+Convert s16le PCM between sample rates with a windowed-sinc filter. Convert mono and stereo channels. Set output volume. Use the stream with Node.js pipelines.
 
 ## Requirements
 
-- Node.js 26 or newer
-- s16le PCM input for stream processing
+Use Node.js 26 or later and npm 12 or later for repository validation. Supply signed 16-bit little-endian PCM input.
 
-## Installation
+## Setup
 
-```bash
-npm install @eliware/resampler
-```
+Install the package with `npm install @eliware/resampler`.
 
 ## Usage
 
-### ESM Example
+Create a `Resampler` Transform stream with input and output sample rates. Pipe s16le PCM data through the stream. Read [release notes](RELEASE_NOTES.md) for release history.
 
 ```js
-import { Resampler } from '@eliware/resampler';
-import fs from 'fs';
+import { Resampler } from "@eliware/resampler";
+import fs from "node:fs";
 
-// Downsample 48kHz stereo to 24kHz mono
-const resampler = new Resampler({ inRate: 48000, outRate: 24000, inChannels: 2, outChannels: 1 });
-fs.createReadStream('input-48k-stereo.s16le')
-  .pipe(resampler)
-  .pipe(fs.createWriteStream('output-24k-mono.s16le'));
-
-// Downsample with half volume
-const resamplerQuiet = new Resampler({ inRate: 48000, outRate: 24000, inChannels: 2, outChannels: 1, volume: 0.5 });
-fs.createReadStream('input-48k-stereo.s16le')
-  .pipe(resamplerQuiet)
-  .pipe(fs.createWriteStream('output-24k-mono-quiet.s16le'));
-```
-
-
-## API
-
-### Resampler(options)
-
-Creates a Transform stream that resamples s16le PCM audio.
-
-#### Options
-
-- `inRate` (number): Input sample rate, finite, greater than 0, and at most 1,000,000 (e.g. 48000)
-- `outRate` (number): Output sample rate, finite, greater than 0, and at most 1,000,000 (e.g. 24000)
-- `inChannels` (number, default 1): Number of input channels (1=mono, 2=stereo)
-- `outChannels` (number, default 1): Number of output channels (1=mono, 2=stereo)
-- `filterWindow` (number, default 8): Positive integer sinc filter window size, at most 4096 (higher = better quality, more CPU)
-- `volume` (number, default 1.0): Finite output volume multiplier (0.0 = silence, 1.0 = unchanged, >1.0 = amplify, negative = polarity inversion)
-
-#### Example
-
-```js
-const resampler = new Resampler({ inRate: 48000, outRate: 24000, inChannels: 2, outChannels: 1, volume: 0.5 });
-```
-
-Input must contain complete s16le PCM frames. Incomplete frames split across stream chunks are buffered; an incomplete final frame emits an error.
-
-#### Filter latency and output length
-
-The sinc filter introduces edge latency. Output begins after enough input is available for the configured filter window, and the stream flush pads the input with `filterWindow` zero samples to emit the available tail. Consequently, output length includes the filter's edge behavior and may differ slightly from the simple `inputFrames * outRate / inRate` estimate. For exact framing, treat the emitted stream length as authoritative.
-
-Pipe PCM data through the resampler:
-
-```js
-inputStream.pipe(resampler).pipe(outputStream);
-```
-
-## Errors / Troubleshooting
-
-Options are validated before processing. Supported channel layouts are mono and stereo. Input must contain complete s16le frames; an incomplete final frame emits an error. Filter latency and output length include documented edge behavior.
-
-## Development
-
-```bash
-npm test
-npm run test:gaps
-npm run lint
-npm run typecheck
-npm run pack
-npm run benchmark -- 48000 5 960
-```
-
-## Security
-
-The resampler performs local audio processing and has no network access. Treat input/output paths, file streams, and any audio data as application-controlled resources; validate untrusted paths and avoid exposing sensitive audio in logs or artifacts.
-
-## TypeScript
-
-Type definitions are included:
-
-```ts
-import { Resampler, ResamplerOptions } from '@eliware/resampler';
-
-const resampler: Resampler = new Resampler({
+const resampler = new Resampler({
   inRate: 48000,
   outRate: 24000,
   inChannels: 2,
   outChannels: 1,
-  volume: 0.5,
 });
+
+fs.createReadStream("input.s16le").pipe(resampler).pipe(fs.createWriteStream("output.s16le"));
 ```
+
+## Development
+
+Read [AGENTS.md](AGENTS.md) before you change files. Use the [docs index](docs/README.md), [specifications index](specs/README.md), and [examples index](examples/README.md) to find project guidance.
+
+## Testing
+
+Run `npm test` for repository validation. Run `npm run pack` to check package contents.
+
+## Troubleshooting
+
+Run `npm ci` after dependency changes. Read [troubleshooting](docs/troubleshooting.md) when validation reports an error.
+
+## Security
+
+The package processes audio data locally. Validate untrusted file paths. Do not expose private audio in logs or generated files.
+
+## API
+
+`Resampler(options)` creates a Transform stream. Set `inRate` and `outRate`. Set `inChannels` and `outChannels` to `1` or `2`. Set `filterWindow` to a positive integer from `1` to `4096`. Set finite `volume` to scale output.
+
+The stream accepts complete s16le frames. It buffers incomplete frames between chunks. It reports an error if the final frame is incomplete. The filter adds edge latency and can change output length.
+
+## Packaging
+
+The package includes `src/`, `docs/`, `examples/`, and `specs/`, plus package metadata and guidance files. Run `npm run pack` to check package contents. Publish only after approved release steps.
+
+## Examples
+
+Run `node examples/example.mjs` to convert the sample files. Read [example guidance](examples/README.md) before you run it.
 
 ## Support
 
@@ -138,13 +89,15 @@ For help, questions, or to chat with the author and community, visit:
 
 **[eliware.org on Discord](https://discord.gg/M6aTR9eTwN)**
 
-## License
-
-[MIT © 2025 Eli Sterling, eliware.org](LICENSE)
-
 ## Links
 
 - [Home Page](https://eliware.org)
-- [GitHub](https://github.com/eliware/resampler)
+- [GitHub Org](https://github.com/eliware)
+- [GitHub Repo](https://github.com/eliware/resampler)
+- [Bug Reports](https://github.com/eliware/resampler/issues)
 - [npm](https://www.npmjs.com/package/@eliware/resampler)
 - [Discord](https://discord.gg/M6aTR9eTwN)
+
+## License
+
+[MIT © Eliware](LICENSE)

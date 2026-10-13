@@ -1,5 +1,5 @@
-import { once } from 'node:events';
-import { Resampler } from './index.mjs';
+import { once } from "node:events";
+import { Resampler } from "./index.mjs";
 
 const frames = Number(process.argv[2] ?? 48000 * 10);
 const repeats = Number(process.argv[3] ?? 5);
@@ -24,7 +24,7 @@ for (const [inRate, outRate, filterWindow] of cases) {
     const start = process.hrtime.bigint();
     const resampler = new Resampler({ inRate, outRate, filterWindow });
     const chunks = [];
-    resampler.on('data', chunk => chunks.push(chunk));
+    resampler.on("data", (chunk) => chunks.push(chunk));
     if (chunkFrames >= frames) {
       resampler.end(input);
     } else {
@@ -34,7 +34,7 @@ for (const [inRate, outRate, filterWindow] of cases) {
       }
       resampler.end();
     }
-    await once(resampler, 'end');
+    await once(resampler, "end");
     timings.push(Number(process.hrtime.bigint() - start) / 1e6);
     outputBytes = Buffer.concat(chunks).length;
     cacheHits += resampler.cacheHits;
@@ -44,19 +44,21 @@ for (const [inRate, outRate, filterWindow] of cases) {
   const medianMs = timings[Math.floor(timings.length / 2)];
   const inputSeconds = frames / inRate;
 
-  console.log(JSON.stringify({
-    frames,
-    repeats,
-    chunkFrames,
-    inRate,
-    outRate,
-    filterWindow,
-    outputBytes,
-    cacheHits,
-    cacheMisses,
-    minMs: Number(timings[0].toFixed(2)),
-    medianMs: Number(medianMs.toFixed(2)),
-    maxMs: Number(timings.at(-1).toFixed(2)),
-    medianRealtimeFactor: Number((inputSeconds / (medianMs / 1000)).toFixed(2)),
-  }));
+  console.log(
+    JSON.stringify({
+      frames,
+      repeats,
+      chunkFrames,
+      inRate,
+      outRate,
+      filterWindow,
+      outputBytes,
+      cacheHits,
+      cacheMisses,
+      minMs: Number(timings[0].toFixed(2)),
+      medianMs: Number(medianMs.toFixed(2)),
+      maxMs: Number(timings.at(-1).toFixed(2)),
+      medianRealtimeFactor: Number((inputSeconds / (medianMs / 1000)).toFixed(2)),
+    }),
+  );
 }

@@ -6,5 +6,5 @@
     "moduleResolution": "NodeNext",
     "skipLibCheck": true
   },
-  "include": ["typecheck.mts"]
+  "include": ["test-fixtures/typecheck.mts"]
 }
