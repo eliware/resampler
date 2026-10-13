@@ -1,29 +1,13 @@
 import { mapChannels } from "./channel-mix.mjs";
 import { getFilterCoefficients } from "./filter.mjs";
+import { readPcmInput } from "./pcm-input.mjs";
+import { writePcmOutput } from "./pcm-output.mjs";
 
 export function transformResampler(resampler, chunk, callback) {
-  if (chunk.length) {
-    resampler.pending = resampler.pending.length
-      ? Buffer.concat([resampler.pending, chunk])
-      : chunk;
-  }
-
-  const frameBytes = 2 * resampler.inChannels;
-  const completeBytes = resampler.pending.length - (resampler.pending.length % frameBytes);
+  const completeBytes = readPcmInput(resampler, chunk);
   if (completeBytes === 0) {
     callback();
     return;
-  }
-
-  const input = resampler.pending.subarray(0, completeBytes);
-  resampler.pending = resampler.pending.subarray(completeBytes);
-  const view = new DataView(input.buffer, input.byteOffset, input.byteLength);
-  const samples = completeBytes / frameBytes;
-  for (let i = 0; i < samples; i++) {
-    for (let ch = 0; ch < resampler.inChannels; ch++) {
-      const val = view.getInt16((i * resampler.inChannels + ch) * 2, true);
-      resampler.buffers[ch].push(val / 32768);
-    }
   }
 
   const outSamples = [];
@@ -76,11 +60,6 @@ export function transformResampler(resampler, chunk, callback) {
     }
   }
 
-  const outBuf = Buffer.allocUnsafe(outSamples.length * 2);
-  for (let i = 0; i < outSamples.length; i++) {
-    const s = Math.max(-1, Math.min(1, outSamples[i] * resampler.volume));
-    outBuf.writeInt16LE(Math.round(s * 32767), i * 2);
-  }
-  resampler.push(outBuf);
+  resampler.push(writePcmOutput(resampler, outSamples));
   callback();
 }
