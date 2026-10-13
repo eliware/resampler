@@ -2,36 +2,42 @@
 
 ## Project
 
-Build the Eliware PCM resampler library with Node.js 26 or later and native ESM.
+Use Node.js 26 or later. Use native ESM.
 
 ## Scope and boundaries
 
-This repository owns PCM sample-rate conversion for Node.js. It does not own audio capture, playback, or external services.
+Keep public use details in README.md and docs/.
 
 ## Layout
 
-Keep runtime modules under `src/` and tests under `tests/`. Keep user documentation under `docs/`, examples under `examples/`, and specifications under `specs/`.
+Keep library modules in src/. Keep their tests in tests/. Index user guides in docs/README.md.
 
 ## Development
 
-Keep source and test modules focused. Mirror each `src/*.mjs` module with one test at the same path under `tests/`. Keep each source file at or below 100 lines and each test file at or below 200 lines.
+Keep each source module matched to one test module.
 
 ## Validation
 
-Use Node.js 26 or later and npm 12 or later. Use native ESM for maintained JavaScript modules. Run `npm test` for aggregate validation. Run `npm run lint`, `npm run audit`, `npm run format`, `npm run format:check`, and `npm run pack` for their named checks.
+Run `npm test` for all checks.
+Run `npm run lint` for lint checks.
+Run `npm run audit` for dependency checks.
+Run `npm run format` to format files.
+Run `npm run format:check` to check file format.
+Run `npm run pack` to check package contents.
+Run `npm run typecheck` to check TypeScript declarations.
 
 ## Security
 
-Keep credentials, secret values, private data, and runtime state out of Git. Validate untrusted file paths and do not expose sensitive audio in logs or generated files.
+Keep credentials and private data out of Git. Publish only after approved release steps.
 
 ## Changes
 
-Keep documentation and examples aligned with the public API. Follow shared conventions. Run required validation before you commit.
+Keep public use details accurate. Keep specs/directives.yaml current.
 
 ## Library
 
-Document supported PCM formats, rates, channels, options, stream behavior, declarations, and package contents in README.md. Test public behavior and observable stream output.
+Document the API, supported use, install steps, options, and package contents in README.md and docs/.
 
 ## npm publication
 
-The public package is `@eliware/resampler`. Include `src/`, `docs/`, `examples/`, and `specs/` in the package. Run `npm run pack` before publication. Follow approved release steps.
+Include specs/ in the package. Run `npm run pack` before release.

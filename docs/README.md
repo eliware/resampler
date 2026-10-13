@@ -1,12 +1,10 @@
 # Documentation
 
-This directory contains end-user documentation for `@eliware/resampler`.
+Use these guides to install and use `@eliware/resampler`.
 
 ## Contents
 
 - [Usage](usage.md)
+- [API](api.md)
+- [PCM format](pcm-format.md)
 - [Troubleshooting](troubleshooting.md)
-
-Audience: package users. Prerequisites: a supported Node.js runtime and a
-configured project. Expected result: documented commands complete without
-undocumented environment assumptions.

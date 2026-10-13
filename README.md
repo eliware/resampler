@@ -23,11 +23,11 @@ A pure JavaScript, high-quality PCM audio resampler for Node.js. Converts s16le 
 
 ## Features
 
-Convert s16le PCM between sample rates with a windowed-sinc filter. Convert mono and stereo channels. Set output volume. Use the stream with Node.js pipelines.
+Convert s16le PCM between sample rates. Mix mono and stereo channels. Set output volume.
 
 ## Requirements
 
-Use Node.js 26 or later and npm 12 or later for repository validation. Supply signed 16-bit little-endian PCM input.
+Use Node.js 26 or later. Supply signed 16-bit little-endian PCM data.
 
 ## Setup
 
@@ -35,51 +35,35 @@ Install the package with `npm install @eliware/resampler`.
 
 ## Usage
 
-Create a `Resampler` Transform stream with input and output sample rates. Pipe s16le PCM data through the stream. Read [release notes](RELEASE_NOTES.md) for release history.
-
-```js
-import { Resampler } from "@eliware/resampler";
-import fs from "node:fs";
-
-const resampler = new Resampler({
-  inRate: 48000,
-  outRate: 24000,
-  inChannels: 2,
-  outChannels: 1,
-});
-
-fs.createReadStream("input.s16le").pipe(resampler).pipe(fs.createWriteStream("output.s16le"));
-```
+Create a `Resampler` stream. Pipe s16le PCM data through it. Read the [user guide](docs/usage.md) and [release notes](RELEASE_NOTES.md).
 
 ## Development
 
-Read [AGENTS.md](AGENTS.md) before you change files. Use the [docs index](docs/README.md), [specifications index](specs/README.md), and [examples index](examples/README.md) to find project guidance.
+Use the [documentation index](docs/README.md), [specifications index](specs/README.md), and [examples index](examples/README.md).
 
 ## Testing
 
-Run `npm test` for repository validation. Run `npm run pack` to check package contents.
+Run `npm test` for all checks. Run `npm run pack` to check package contents.
 
 ## Troubleshooting
 
-Run `npm ci` after dependency changes. Read [troubleshooting](docs/troubleshooting.md) when validation reports an error.
+Read the [troubleshooting guide](docs/troubleshooting.md) when output or validation fails.
 
 ## Security
 
-The package processes audio data locally. Validate untrusted file paths. Do not expose private audio in logs or generated files.
+Validate untrusted file paths. Keep private audio out of logs and generated files.
 
 ## API
 
-`Resampler(options)` creates a Transform stream. Set `inRate` and `outRate`. Set `inChannels` and `outChannels` to `1` or `2`. Set `filterWindow` to a positive integer from `1` to `4096`. Set finite `volume` to scale output.
-
-The stream accepts complete s16le frames. It buffers incomplete frames between chunks. It reports an error if the final frame is incomplete. The filter adds edge latency and can change output length.
+Read the [API guide](docs/api.md) for options, frame rules, channel maps, and output behavior.
 
 ## Packaging
 
-The package includes `src/`, `docs/`, `examples/`, and `specs/`, plus package metadata and guidance files. Run `npm run pack` to check package contents. Publish only after approved release steps.
+The package includes `src/`, `docs/`, `examples/`, and `specs/`. Read the [package guide](docs/usage.md#package-contents). Publish only after approved release steps.
 
 ## Examples
 
-Run `node examples/example.mjs` to convert the sample files. Read [example guidance](examples/README.md) before you run it.
+Run `node examples/example.mjs`. Read [example guidance](examples/README.md).
 
 ## Support
 
