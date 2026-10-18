@@ -24,6 +24,6 @@ Each stereo frame contains the left sample, then the right sample. Each sample u
 
 ## Stream chunks
 
-A chunk can end in the middle of a frame. The resampler keeps those bytes and joins them to the next chunk. The final input must contain complete frames. The stream emits an error when the final frame is incomplete.
+A chunk can end in the middle of a frame. The resampler keeps those bytes and joins them to the chunk that comes after it. The final input must contain complete frames. The stream emits an error when the final frame is incomplete.
 
 Set `inChannels` to match the input layout. Set `outChannels` to the required output layout. Read the [API guide](api.md) for channel maps and output behavior.

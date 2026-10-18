@@ -34,7 +34,7 @@ The example changes 48 kHz stereo audio to 24 kHz mono audio. The resampler uses
 
 ## Control output level
 
-Set `volume` to change the output level. A value of `0.5` halves the level. A value of `0` makes silence. A negative value reverses signal polarity.
+Set `volume` to change the output level. A value of `0.5` halves the level. A value of `0` sets each output sample to `0`. A negative value changes signal polarity.
 
 ```js
 const resampler = new Resampler({
@@ -56,6 +56,6 @@ Import the public API from `@eliware/resampler`. Do not import files under `src/
 
 ## Release limits
 
-The package contains local audio processing code. The package does not capture or play audio. It does not access a network service.
+The package contains local audio processing code. The package does not capture or play audio. It does not connect to a network.
 
 Run `npm run pack` in a source checkout to inspect package contents. Publish only after the project owner approves the release.

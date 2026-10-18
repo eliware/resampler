@@ -1,10 +1,17 @@
-version: "12.0"
+version: "13.0"
 description: Local requirements for the Eliware PCM resampler library.
 directives:
   - id: E-240.0
     dos:
-      - Convert signed 16-bit little-endian PCM between supported sample rates and mono or stereo channel layouts.
-      - Preserve the documented Transform stream API, frame validation, filter behavior, and output volume rules.
-      - Keep package metadata, declarations, examples, documentation, and tests aligned with the public API.
+      - >-
+        Convert signed 16-bit little-endian PCM between supported sample rates and mono or stereo
+        layouts.
+      - >-
+        Preserve the Transform stream API, frame checks, filter behavior, and output volume rules.
+      - >-
+        Keep package metadata, declarations, examples, documentation, and tests aligned with the
+        public API.
     donts:
-      - Do not claim support for PCM formats or channel layouts that the implementation does not provide.
+      - >-
+        Do not claim support for PCM formats or channel layouts that the implementation does not
+        provide.

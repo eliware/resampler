@@ -1,5 +1,5 @@
-import { transformResampler } from "../src/resampler-transform.mjs";
-import { Resampler } from "../src/resampler.mjs";
+import { transformResampler } from "../../src/resampler/transform.mjs";
+import { Resampler } from "../../src/resampler.mjs";
 
 test("transforms PCM samples and calls the stream callback", () => {
   const resampler = new Resampler({ inRate: 24000, outRate: 24000, filterWindow: 1 });

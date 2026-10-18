@@ -1,7 +1,7 @@
 import { Transform } from "stream";
 import { createFilterCache } from "./filter.mjs";
-import { transformResampler } from "./resampler-transform.mjs";
-import { flushResampler } from "./resampler-flush.mjs";
+import { transformResampler } from "./resampler/transform.mjs";
+import { flushResampler } from "./resampler/flush.mjs";
 import { validateOptions } from "./validate-options.mjs";
 
 export class Resampler extends Transform {

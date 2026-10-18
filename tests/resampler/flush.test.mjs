@@ -1,5 +1,5 @@
-import { flushResampler } from "../src/resampler-flush.mjs";
-import { Resampler } from "../src/resampler.mjs";
+import { flushResampler } from "../../src/resampler/flush.mjs";
+import { Resampler } from "../../src/resampler.mjs";
 
 test("flushes the filter tail", () => {
   const resampler = new Resampler({ inRate: 24000, outRate: 24000, filterWindow: 1 });

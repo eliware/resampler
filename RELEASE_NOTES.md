@@ -1,5 +1,15 @@
 # Release Notes
 
+## 13.0.0 — 2026-10-17
+
+### Changed
+
+- Set the package and validation tool versions to 13.0.0.
+- Moved helper modules and tests into focused folders.
+- Replaced the custom npm publish workflow with the canonical workflow.
+- Updated the Knit deploy commands and repository guidance for v13.
+- Updated user guides to use the same terms.
+
 ## 12.0.0 — 2026-10-13
 
 ### Added
@@ -19,7 +29,7 @@
 - Added matching tests for the focused modules. Kept stream integration tests with the stream module.
 - Moved the benchmark and type-check fixture into their current directories.
 - Updated the README, benchmark guide, examples, package files, and repository guidance.
-- Replaced the old Node.js workflow with separate validation and publish workflows.
+- Replaced the Node.js workflow with separate validation and publish workflows.
 - Updated the license copyright notice to Eliware, 2026.
 
 ### Fixed
@@ -27,29 +37,3 @@
 - Corrected documentation links and added indexes for each content area.
 - Corrected PCM output so negative full scale encodes as -32768.
 - Formatted maintained files with the shared package rules.
-
-## 1.1.3 — 2026-08-07
-
-### Changed
-
-Version 1.1.3 added package metadata, published files, CI checks, docs, examples, and validation for Eliware library rules.
-
-### Fixed
-
-The release removed the legacy `main` entry and tests from the npm package.
-
-## 1.1.2 — 2026-08-07
-
-### Added
-
-Version 1.1.2 added anti-alias filtering, a coefficient cache, input limits, mono and stereo maps, volume control, declarations, examples, benchmark code, and tests.
-
-### Changed
-
-The release split the resampler into ESM modules. It removed the `@eliware/common` runtime dependency and CommonJS entrypoints.
-
-## 1.1.1 — 2025-12-09
-
-### Added
-
-Version 1.1.1 was the first release of the resampler package.

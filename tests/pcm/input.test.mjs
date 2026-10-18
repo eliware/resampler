@@ -1,4 +1,4 @@
-import { readPcmInput } from "../src/pcm-input.mjs";
+import { readPcmInput } from "../../src/pcm/input.mjs";
 
 function makeResampler(inChannels = 1) {
   return {

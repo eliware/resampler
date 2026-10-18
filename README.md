@@ -23,7 +23,7 @@ A pure JavaScript, high-quality PCM audio resampler for Node.js. Converts s16le 
 
 ## Features
 
-Convert s16le PCM between sample rates. Mix mono and stereo channels. Set output volume.
+Convert s16le PCM between sample rates. Convert mono input to stereo output or stereo input to mono output. Set output volume.
 
 ## Requirements
 

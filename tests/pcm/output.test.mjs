@@ -1,4 +1,4 @@
-import { writePcmOutput } from "../src/pcm-output.mjs";
+import { writePcmOutput } from "../../src/pcm/output.mjs";
 
 test("scales and encodes samples as little-endian PCM", () => {
   const output = writePcmOutput({ volume: 0.5 }, [0.5, -0.5]);

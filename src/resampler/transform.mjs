@@ -1,7 +1,7 @@
-import { mapChannels } from "./channel-mix.mjs";
-import { getFilterCoefficients } from "./filter.mjs";
-import { readPcmInput } from "./pcm-input.mjs";
-import { writePcmOutput } from "./pcm-output.mjs";
+import { mapChannels } from "../channel-mix.mjs";
+import { getFilterCoefficients } from "../filter.mjs";
+import { readPcmInput } from "../pcm/input.mjs";
+import { writePcmOutput } from "../pcm/output.mjs";
 
 export function transformResampler(resampler, chunk, callback) {
   const completeBytes = readPcmInput(resampler, chunk);

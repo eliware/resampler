@@ -21,7 +21,7 @@ Pipe signed 16-bit little-endian PCM data into the stream. Read PCM output from 
 | `inChannels`   | No       | `1`     | `1` for mono or `2` for stereo.                           |
 | `outChannels`  | No       | `1`     | `1` for mono or `2` for stereo.                           |
 | `filterWindow` | No       | `8`     | Integer from `1` to `4096`. A larger value uses more CPU. |
-| `volume`       | No       | `1`     | Any finite number. Negative values reverse polarity.      |
+| `volume`       | No       | `1`     | Finite number. Negative values change signal polarity.    |
 
 The constructor throws `TypeError` when an option has an invalid value.
 
@@ -32,15 +32,15 @@ Stereo-to-mono output averages the left and right samples. Stereo-to-stereo outp
 
 ## Frames and chunks
 
-Each input frame contains one sample per input channel. Each sample uses two bytes. A mono frame uses two bytes. A stereo frame uses four bytes.
+Each input frame contains one sample for each input channel. Each sample uses two bytes. A mono frame uses two bytes. A stereo frame uses four bytes.
 
 The stream buffers incomplete frames across chunks. It emits an error if the final input does not contain a complete frame.
 
-## Filter delay and output size
+## Filter wait and output length
 
-The windowed-sinc filter waits for enough input before it writes output. At stream end, it adds `filterWindow` zero samples to write the available tail.
+The windowed-sinc filter waits until it has sufficient input before it writes output. At stream end, it adds `filterWindow` zero samples to write the available tail.
 
-This edge behavior can change the output length. Use the emitted stream length as the exact output size. Do not rely on a simple rate ratio for exact frame counts.
+This behavior can change the output length. Use the emitted stream length for the exact frame count. Do not use a rate ratio to calculate an exact frame count.
 
 ## Output level
 

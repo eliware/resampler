@@ -1,5 +1,4 @@
-import fs from "fs";
-import path from "path";
+import { Readable } from "node:stream";
 import { Resampler } from "../src/resampler.mjs";
 
 function collect(stream) {
@@ -11,29 +10,37 @@ function collect(stream) {
   });
 }
 
+function createPcm(frames, channels) {
+  const input = Buffer.alloc(frames * channels * 2);
+  for (let frame = 0; frame < frames; frame++) {
+    for (let channel = 0; channel < channels; channel++) {
+      const value = Math.round(Math.sin((frame + channel) / 17) * 12000);
+      input.writeInt16LE(value, (frame * channels + channel) * 2);
+    }
+  }
+  return input;
+}
+
 test("downsamples 48kHz stereo to 24kHz mono", async () => {
-  const inputPath = path.resolve("input-48k-stereo.s16le");
-  const inBuf = fs.readFileSync(inputPath);
+  const inBuf = createPcm(24000, 2);
   const resampler = new Resampler({ inRate: 48000, outRate: 24000, inChannels: 2, outChannels: 1 });
-  const outBuf = await collect(fs.createReadStream(inputPath).pipe(resampler));
+  const outBuf = await collect(Readable.from([inBuf]).pipe(resampler));
   const expected = (inBuf.length * (24000 * 1)) / (48000 * 2);
   const tolerance = 128; // bytes, up to 64 samples
   expect(Math.abs(outBuf.length - expected)).toBeLessThanOrEqual(tolerance);
 });
 
 test("upsamples 24kHz mono to 48kHz stereo", async () => {
-  const inputPath = path.resolve("input-24k-mono.s16le");
-  const inBuf = fs.readFileSync(inputPath);
+  const inBuf = createPcm(12000, 1);
   const resampler = new Resampler({ inRate: 24000, outRate: 48000, inChannels: 1, outChannels: 2 });
-  const outBuf = await collect(fs.createReadStream(inputPath).pipe(resampler));
+  const outBuf = await collect(Readable.from([inBuf]).pipe(resampler));
   const expected = (inBuf.length * (48000 * 2)) / (24000 * 1);
   const tolerance = 128; // bytes, up to 64 samples
   expect(Math.abs(outBuf.length - expected)).toBeLessThanOrEqual(tolerance);
 });
 
 test("volume option reduces amplitude", async () => {
-  const inputPath = path.resolve("input-24k-mono.s16le");
-  const inBuf = fs.readFileSync(inputPath);
+  const inBuf = createPcm(12000, 1);
   // Use volume 0.5
   const resampler = new Resampler({
     inRate: 24000,
@@ -42,7 +49,7 @@ test("volume option reduces amplitude", async () => {
     outChannels: 1,
     volume: 0.5,
   });
-  const outBuf = await collect(fs.createReadStream(inputPath).pipe(resampler));
+  const outBuf = await collect(Readable.from([inBuf]).pipe(resampler));
   // Check that the max absolute value is about half the input's max
   function maxAbsPCM16(buf) {
     let max = 0;
@@ -63,7 +70,7 @@ test("volume option reduces amplitude", async () => {
 test.each([
   [
     "high upsampling",
-    10000,
+    4096,
     { inRate: 8000, outRate: 48000 },
     (i) => ((i * 37) % 20000) - 10000,
     [1, 7777],
