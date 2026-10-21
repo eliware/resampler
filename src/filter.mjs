@@ -12,7 +12,7 @@ export function createFilterCache() {
 }
 
 export function getFilterCoefficients(cache, fraction, cutoff, filterWindow) {
-  const cacheKey = fraction.toString();
+  const cacheKey = `${fraction}|${cutoff}|${filterWindow}`;
   let coefficients = cache.get(cacheKey);
   if (coefficients) return { coefficients, hit: true };
 

@@ -62,6 +62,16 @@ export class Resampler extends Transform {
     transformResampler(this, chunk, callback);
   }
 
+  _read(size) {
+    if (this.resumeTransform) {
+      const resume = this.resumeTransform;
+      this.resumeTransform = null;
+      resume();
+      return;
+    }
+    super._read(size);
+  }
+
   _flush(callback) {
     flushResampler(this, callback);
   }

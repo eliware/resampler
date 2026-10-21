@@ -3,6 +3,8 @@ import { getFilterCoefficients } from "../filter.mjs";
 import { readPcmInput } from "../pcm/input.mjs";
 import { writePcmOutput } from "../pcm/output.mjs";
 
+const OUTPUT_BATCH_SAMPLES = 1024;
+
 export function transformResampler(resampler, chunk, callback) {
   const completeBytes = readPcmInput(resampler, chunk);
   const inputBytes = completeBytes;
@@ -17,69 +19,89 @@ export function transformResampler(resampler, chunk, callback) {
     return;
   }
 
-  const outSamples = [];
+  let outSamples = [];
   const weights = [];
-  while (
+  const hasOutput = () =>
     resampler.phase + resampler.filterWindow <=
-    resampler.buffers[0].length - resampler.bufferOffset + Number.EPSILON
-  ) {
-    const pos = resampler.phase;
-    const i0 = Math.floor(pos);
-    const fraction = pos - i0;
-    const { coefficients, hit } = getFilterCoefficients(
-      resampler.coefficientCache,
-      fraction,
-      resampler.cutoff,
-      resampler.filterWindow,
-    );
-    if (hit) resampler.cacheHits++;
-    else resampler.cacheMisses++;
+    resampler.buffers[0].length - resampler.bufferOffset + Number.EPSILON;
 
-    weights.length = 0;
-    for (const [offset, weight] of coefficients) weights.push([i0 + offset, weight]);
-    const channelVals = [];
-    for (let ch = 0; ch < resampler.inChannels; ch++) {
-      let sum = 0;
-      for (const [k, weight] of weights) {
-        sum += (resampler.buffers[ch][k + resampler.bufferOffset] || 0) * weight;
+  const finish = () => {
+    const drop = Math.floor(resampler.phase) - resampler.filterWindow;
+    if (drop > 0) {
+      resampler.bufferOffset += drop;
+      resampler.phase -= drop;
+      if (resampler.bufferOffset >= 4096) {
+        resampler.buffers = resampler.buffers.map((buf) => buf.slice(resampler.bufferOffset));
+        resampler.bufferBase += resampler.bufferOffset;
+        resampler.bufferOffset = 0;
+        resampler.phase =
+          resampler.filterWindow + resampler.outputIndex * resampler.ratio - resampler.bufferBase;
       }
-      channelVals.push(sum / coefficients.weightSum);
     }
-    outSamples.push(...mapChannels(channelVals, resampler.inChannels, resampler.outChannels));
-    resampler.outputIndex++;
-    resampler.phase =
-      resampler.filterWindow +
-      resampler.outputIndex * resampler.ratio -
-      resampler.bufferBase -
-      resampler.bufferOffset;
-  }
 
-  const drop = Math.floor(resampler.phase) - resampler.filterWindow;
-  if (drop > 0) {
-    resampler.bufferOffset += drop;
-    resampler.phase -= drop;
-    if (resampler.bufferOffset >= 4096) {
-      resampler.buffers = resampler.buffers.map((buf) => buf.slice(resampler.bufferOffset));
-      resampler.bufferBase += resampler.bufferOffset;
-      resampler.bufferOffset = 0;
+    resampler.logger.verbose("Resampler processed input", {
+      component: "@eliware/resampler",
+      event: "resampler.chunk",
+      inputBytes,
+      outputSamples,
+      pendingBytes: resampler.pending.length,
+    });
+    resampler.logger.silly("Resampler filter cache status", {
+      component: "@eliware/resampler",
+      event: "resampler.filter_cache",
+      hits: resampler.cacheHits,
+      misses: resampler.cacheMisses,
+    });
+    callback();
+  };
+
+  let outputSamples = 0;
+  const processOutput = () => {
+    while (hasOutput()) {
+      const pos = resampler.phase;
+      const i0 = Math.floor(pos);
+      const fraction = pos - i0;
+      const { coefficients, hit } = getFilterCoefficients(
+        resampler.coefficientCache,
+        fraction,
+        resampler.cutoff,
+        resampler.filterWindow,
+      );
+      if (hit) resampler.cacheHits++;
+      else resampler.cacheMisses++;
+
+      weights.length = 0;
+      for (const [offset, weight] of coefficients) weights.push([i0 + offset, weight]);
+      const channelVals = [];
+      for (let ch = 0; ch < resampler.inChannels; ch++) {
+        let sum = 0;
+        for (const [k, weight] of weights) {
+          sum += (resampler.buffers[ch][k + resampler.bufferOffset] || 0) * weight;
+        }
+        channelVals.push(sum / coefficients.weightSum);
+      }
+      outSamples.push(...mapChannels(channelVals, resampler.inChannels, resampler.outChannels));
+      outputSamples += resampler.outChannels;
+      resampler.outputIndex++;
       resampler.phase =
-        resampler.filterWindow + resampler.outputIndex * resampler.ratio - resampler.bufferBase;
-    }
-  }
+        resampler.filterWindow +
+        resampler.outputIndex * resampler.ratio -
+        resampler.bufferBase -
+        resampler.bufferOffset;
 
-  resampler.push(writePcmOutput(resampler, outSamples));
-  resampler.logger.verbose("Resampler processed input", {
-    component: "@eliware/resampler",
-    event: "resampler.chunk",
-    inputBytes,
-    outputSamples: outSamples.length,
-    pendingBytes: resampler.pending.length,
-  });
-  resampler.logger.silly("Resampler filter cache status", {
-    component: "@eliware/resampler",
-    event: "resampler.filter_cache",
-    hits: resampler.cacheHits,
-    misses: resampler.cacheMisses,
-  });
-  callback();
+      if (outSamples.length >= OUTPUT_BATCH_SAMPLES) {
+        const output = writePcmOutput(resampler, outSamples);
+        outSamples = [];
+        if (!resampler.push(output)) {
+          resampler.resumeTransform = processOutput;
+          return;
+        }
+      }
+    }
+
+    if (outSamples.length) resampler.push(writePcmOutput(resampler, outSamples));
+    finish();
+  };
+
+  processOutput();
 }

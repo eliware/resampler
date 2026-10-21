@@ -24,6 +24,19 @@ test("covers filter coefficient edge branches", () => {
   expect(cache.size).toBe(4096);
 });
 
+test("keys cached coefficients by phase, cutoff, and filter window", () => {
+  const cache = createFilterCache();
+  const first = getFilterCoefficients(cache, 0.25, 1, 2);
+  const changedCutoff = getFilterCoefficients(cache, 0.25, 0.5, 2);
+  const changedWindow = getFilterCoefficients(cache, 0.25, 0.5, 3);
+
+  expect(first.hit).toBe(false);
+  expect(changedCutoff.hit).toBe(false);
+  expect(changedWindow.hit).toBe(false);
+  expect(getFilterCoefficients(cache, 0.25, 0.5, 3).hit).toBe(true);
+  expect(changedCutoff.coefficients).not.toEqual(first.coefficients);
+});
+
 test("uses an anti-alias cutoff when downsampling", () => {
   const downsampler = new Resampler({ inRate: 48000, outRate: 24000 });
   const upsampler = new Resampler({ inRate: 24000, outRate: 48000 });

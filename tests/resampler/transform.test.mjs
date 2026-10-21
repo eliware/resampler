@@ -13,3 +13,17 @@ test("transforms PCM samples and calls the stream callback", () => {
   expect(callCount).toBe(1);
   expect(resampler.read()).toBeInstanceOf(Buffer);
 });
+
+test("resumes a large transform when the readable side requests more data", () => {
+  const resampler = new Resampler({ inRate: 24000, outRate: 48000 });
+  let writeComplete = false;
+
+  resampler.write(Buffer.alloc(40000), () => {
+    writeComplete = true;
+  });
+
+  expect(writeComplete).toBe(false);
+  expect(resampler.resumeTransform).toEqual(expect.any(Function));
+  while (resampler.read() !== null) {}
+  expect(writeComplete).toBe(true);
+});
