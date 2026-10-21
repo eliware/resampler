@@ -22,8 +22,17 @@ Pipe signed 16-bit little-endian PCM data into the stream. Read PCM output from 
 | `outChannels`  | No       | `1`     | `1` for mono or `2` for stereo.                           |
 | `filterWindow` | No       | `8`     | Integer from `1` to `4096`. A larger value uses more CPU. |
 | `volume`       | No       | `1`     | Finite number. Negative values change signal polarity.    |
+| `logger`       | No       | Silent  | Logger from `@eliware/log` or a compatible logger.        |
 
 The constructor throws `TypeError` when an option has an invalid value.
+
+## Logging
+
+Pass a logger from `@eliware/log` with the `logger` option to receive structured records. The default logger writes no records.
+
+The resampler uses the `debug`, `verbose`, `silly`, `info`, `warn`, and `error` levels for creation, input, cache, and stream events. The logger also supports the `http` level, but the resampler does not write HTTP records.
+
+Records include an `event` field and safe operation details. The resampler does not log audio data, credentials, tokens, or error messages.
 
 ## Channel maps
 

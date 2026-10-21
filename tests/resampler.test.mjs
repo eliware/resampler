@@ -21,6 +21,58 @@ function createPcm(frames, channels) {
   return input;
 }
 
+function createLogger() {
+  const records = [];
+  const logger = Object.fromEntries(
+    ["error", "warn", "info", "http", "verbose", "debug", "silly"].map((level) => [
+      level,
+      (message, fields) => records.push({ level, message, fields }),
+    ]),
+  );
+  return { logger, records };
+}
+
+test("writes structured records through the injected logger", async () => {
+  const { logger, records } = createLogger();
+  const input = createPcm(64, 1);
+  const output = await collect(
+    Readable.from([input]).pipe(new Resampler({ inRate: 24000, outRate: 24000, logger })),
+  );
+
+  expect(output.length).toBeGreaterThan(0);
+  expect(records.map(({ fields }) => fields.event)).toEqual(
+    expect.arrayContaining([
+      "resampler.created",
+      "resampler.chunk",
+      "resampler.filter_cache",
+      "resampler.flushed",
+    ]),
+  );
+  expect(records.find(({ fields }) => fields.event === "resampler.created").fields).toMatchObject({
+    inRate: 24000,
+    outRate: 24000,
+    inChannels: 1,
+    outChannels: 1,
+  });
+  expect(records.every(({ fields }) => !("audio" in fields) && !("error" in fields))).toBe(true);
+});
+
+test("logs an incomplete frame without logging its audio bytes", async () => {
+  const { logger, records } = createLogger();
+  const resampler = new Resampler({ inRate: 24000, outRate: 24000, logger });
+  const error = new Promise((resolve) => resampler.once("error", resolve));
+  resampler.end(Buffer.from([0xab]));
+
+  await expect(error).resolves.toBeInstanceOf(Error);
+  expect(records.find(({ fields }) => fields.event === "resampler.incomplete_frame")).toMatchObject(
+    {
+      level: "warn",
+      fields: { pendingBytes: 1, inChannels: 1 },
+    },
+  );
+  expect(JSON.stringify(records)).not.toContain("171");
+});
+
 test("downsamples 48kHz stereo to 24kHz mono", async () => {
   const inBuf = createPcm(24000, 2);
   const resampler = new Resampler({ inRate: 48000, outRate: 24000, inChannels: 2, outChannels: 1 });
@@ -143,14 +195,37 @@ test("volume zero produces silence", async () => {
 });
 
 test("propagates errors thrown while flushing", async () => {
+  const { logger, records } = createLogger();
   class FailingResampler extends Resampler {
     _transform() {
       throw new Error("flush failure");
     }
   }
 
-  const resampler = new FailingResampler({ inRate: 24000, outRate: 24000 });
+  const resampler = new FailingResampler({ inRate: 24000, outRate: 24000, logger });
   const error = new Promise((resolve) => resampler.once("error", resolve));
   resampler.end();
   await expect(error).resolves.toThrow("flush failure");
+  expect(records.find(({ fields }) => fields.event === "resampler.flush_failed")).toMatchObject({
+    level: "error",
+    fields: { errorType: "Error" },
+  });
+});
+
+test("logs and propagates errors returned while flushing", async () => {
+  const { logger, records } = createLogger();
+  class CallbackFailingResampler extends Resampler {
+    _transform(_chunk, _encoding, callback) {
+      callback(new Error("callback failure"));
+    }
+  }
+
+  const resampler = new CallbackFailingResampler({ inRate: 24000, outRate: 24000, logger });
+  const error = new Promise((resolve) => resampler.once("error", resolve));
+  resampler.end();
+  await expect(error).resolves.toThrow("callback failure");
+  expect(records.find(({ fields }) => fields.event === "resampler.flush_failed")).toMatchObject({
+    level: "error",
+    fields: { errorType: "Error" },
+  });
 });

@@ -5,7 +5,14 @@ import { writePcmOutput } from "../pcm/output.mjs";
 
 export function transformResampler(resampler, chunk, callback) {
   const completeBytes = readPcmInput(resampler, chunk);
+  const inputBytes = completeBytes;
   if (completeBytes === 0) {
+    resampler.logger.silly("Resampler received no complete input frame", {
+      component: "@eliware/resampler",
+      event: "resampler.input_pending",
+      inputBytes: chunk.length,
+      pendingBytes: resampler.pending.length,
+    });
     callback();
     return;
   }
@@ -61,5 +68,18 @@ export function transformResampler(resampler, chunk, callback) {
   }
 
   resampler.push(writePcmOutput(resampler, outSamples));
+  resampler.logger.verbose("Resampler processed input", {
+    component: "@eliware/resampler",
+    event: "resampler.chunk",
+    inputBytes,
+    outputSamples: outSamples.length,
+    pendingBytes: resampler.pending.length,
+  });
+  resampler.logger.silly("Resampler filter cache status", {
+    component: "@eliware/resampler",
+    event: "resampler.filter_cache",
+    hits: resampler.cacheHits,
+    misses: resampler.cacheMisses,
+  });
   callback();
 }

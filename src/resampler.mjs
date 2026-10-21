@@ -4,6 +4,17 @@ import { transformResampler } from "./resampler/transform.mjs";
 import { flushResampler } from "./resampler/flush.mjs";
 import { validateOptions } from "./validate-options.mjs";
 
+const noLog = () => {};
+const defaultLogger = Object.freeze({
+  error: noLog,
+  warn: noLog,
+  info: noLog,
+  http: noLog,
+  verbose: noLog,
+  debug: noLog,
+  silly: noLog,
+});
+
 export class Resampler extends Transform {
   constructor({
     inRate,
@@ -12,6 +23,7 @@ export class Resampler extends Transform {
     outChannels = 1,
     filterWindow = 8,
     volume = 1.0,
+    logger = defaultLogger,
   } = {}) {
     validateOptions({ inRate, outRate, inChannels, outChannels, filterWindow, volume });
 
@@ -29,10 +41,21 @@ export class Resampler extends Transform {
     this.buffers = Array.from({ length: inChannels }, () => []);
     this.bufferOffset = 0;
     this.volume = volume;
+    this.logger = logger;
     this.pending = Buffer.alloc(0);
     this.coefficientCache = createFilterCache();
     this.cacheHits = 0;
     this.cacheMisses = 0;
+    this.logger.debug("Resampler created", {
+      component: "@eliware/resampler",
+      event: "resampler.created",
+      inRate,
+      outRate,
+      inChannels,
+      outChannels,
+      filterWindow,
+      volume,
+    });
   }
 
   _transform(chunk, encoding, callback) {

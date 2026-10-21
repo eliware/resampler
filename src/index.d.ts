@@ -1,4 +1,5 @@
 import { Transform } from "stream";
+import type { LoggerWithConfiguredLevels } from "@eliware/log";
 
 /**
  * Options for Resampler
@@ -16,6 +17,8 @@ export interface ResamplerOptions {
   filterWindow?: number;
   /** Finite output volume multiplier (default: 1.0); negative values invert polarity */
   volume?: number;
+  /** Structured logger. The default logger does not write records. */
+  logger?: LoggerWithConfiguredLevels;
 }
 
 /**
