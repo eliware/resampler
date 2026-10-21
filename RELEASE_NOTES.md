@@ -1,13 +1,14 @@
 # Release Notes
 
-## 13.0.0 — 2026-10-17
+## 14.0.0 — 2026-10-21
 
 ### Changed
 
-- Set the package and validation tool versions to 13.0.0.
+- Set the package and validation tool versions to 14.0.0.
+- Updated dependencies to current releases.
 - Moved helper modules and tests into focused folders.
 - Replaced the custom npm publish workflow with the canonical workflow.
-- Updated the Knit deploy commands and repository guidance for v13.
+- Updated the Knit deploy commands and repository guidance for v14.
 - Updated user guides to use the same terms.
 
 ## 12.0.0 — 2026-10-13
