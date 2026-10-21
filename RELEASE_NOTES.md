@@ -2,14 +2,27 @@
 
 ## 14.0.0 — 2026-10-21
 
+### Added
+
+- Added an optional `logger` API option with structured records from `@eliware/log`.
+- Added TypeScript declarations and API guidance for the logger option and its records.
+- Added end-user guides for PCM data, stream use, API options, logging, and troubleshooting.
+
 ### Changed
 
-- Set the package and validation tool versions to 14.0.0.
-- Updated dependencies to current releases.
-- Moved helper modules and tests into focused folders.
-- Replaced the custom npm publish workflow with the canonical workflow.
-- Updated the Knit deploy commands and repository guidance for v14.
-- Updated user guides to use the same terms.
+- Updated package metadata and dependencies for v14.0.0. Added `@eliware/log` as a runtime dependency.
+- Reorganized PCM and resampler helpers with matching tests in focused folders.
+- Processed large input in bounded output batches and paused between batches when the readable stream applied backpressure.
+- Joined split PCM frames without copying each full input chunk.
+- Updated README.md and AGENTS.md to keep only required repository and package guidance.
+- Aligned CI and npm publication workflows with the current shared workflows.
+- Updated the Knit deployment workflow to use the standard install and test commands.
+
+### Fixed
+
+- Included cutoff and filter window values in filter coefficient cache keys.
+- Changed the benchmark to import the public package entry point and reject invalid frame, repeat, and chunk counts.
+- Corrected API and troubleshooting guidance to describe actual filter output length and stream behavior.
 
 ## 12.0.0 — 2026-10-13
 
