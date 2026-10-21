@@ -1,5 +1,5 @@
 import { once } from "node:events";
-import { Resampler } from "./index.mjs";
+import { Resampler } from "@eliware/resampler";
 
 const frames = Number(process.argv[2] ?? 48000 * 10);
 const repeats = Number(process.argv[3] ?? 5);
