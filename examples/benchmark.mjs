@@ -4,6 +4,14 @@ import { Resampler } from "@eliware/resampler";
 const frames = Number(process.argv[2] ?? 48000 * 10);
 const repeats = Number(process.argv[3] ?? 5);
 const chunkFrames = Number(process.argv[4] ?? frames);
+if (
+  ![frames, repeats, chunkFrames].every(Number.isSafeInteger) ||
+  frames <= 0 ||
+  repeats <= 0 ||
+  chunkFrames <= 0
+) {
+  throw new RangeError("frames, repeats, and chunkFrames must be positive integers");
+}
 const input = Buffer.alloc(frames * 2);
 for (let i = 0; i < frames; i++) input.writeInt16LE(Math.sin(i / 17) * 12000, i * 2);
 
