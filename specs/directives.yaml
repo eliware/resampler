@@ -1,4 +1,4 @@
-version: "14.0"
+version: "15.0"
 description: Local requirements for the Eliware PCM resampler library.
 directives:
   - id: E-240.0

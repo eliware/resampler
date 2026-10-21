@@ -1,5 +1,14 @@
 # Release Notes
 
+## 15.0.0 — 2026-10-21
+
+### Changed
+
+- Updated the package to v15.0.0 and aligned the local specification with Eliware Test v15.
+- Updated `@eliware/log` and `@eliware/test` to v15.0.0 and refreshed the lockfile.
+- Updated repository guidance to match Eliware Test v15 requirements.
+- Aligned release guidance with the Operations release handoff.
+
 ## 14.0.0 — 2026-10-21
 
 ### Added

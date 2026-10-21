@@ -85,4 +85,4 @@ Import the public API from `@eliware/resampler`. Do not import files under `src/
 
 The package processes PCM data that your application supplies. It does not capture or play audio. It does not connect to a network.
 
-Run `npm run pack` in a source checkout to inspect package contents. Publish only after the project owner approves the release.
+Run `npm run pack` in a source checkout to inspect package contents. Use the approved Operations release handoff before publication.

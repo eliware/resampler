@@ -59,7 +59,7 @@ Read the [API guide](docs/api.md) for options and stream behavior.
 
 ## Packaging
 
-The package includes `src/`, `docs/`, `examples/`, and `specs/`. Run `npm run pack` to check package contents. Publish only after approved release steps.
+The package includes `src/`, `docs/`, `examples/`, and `specs/`. Run `npm run pack` to check package contents. Use the approved Operations release handoff before publication.
 
 ## Examples
 

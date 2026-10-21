@@ -1,6 +1,6 @@
 {
   "name": "@eliware/resampler",
-  "version": "14.0.0",
+  "version": "15.0.0",
   "type": "module",
   "description": "A pure JavaScript, high-quality PCM audio resampler for Node.js. Converts s16le PCM between arbitrary sample rates and channel layouts (mono/stereo) with windowed-sinc filtering.",
   "keywords": [
@@ -47,10 +47,10 @@
     "node": ">=26"
   },
   "dependencies": {
-    "@eliware/log": "^14.0.0"
+    "@eliware/log": "^15.0.0"
   },
   "devDependencies": {
-    "@eliware/test": "^14.0.0",
+    "@eliware/test": "^15.0.0",
     "typescript": "^7.0.2"
   },
   "jest": {
