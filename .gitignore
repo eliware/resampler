@@ -14,5 +14,6 @@ Thumbs.db
 .idea/
 .vscode/
 generated/
+resampler-example-output/
 .env*
 !.env*.example

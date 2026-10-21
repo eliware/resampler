@@ -36,6 +36,10 @@ This example converts 48 kHz stereo input to 24 kHz mono output. The file must c
 
 The stream can split a PCM frame across input chunks. It keeps the remaining bytes until a later chunk. It reports an error when the final chunk ends inside a frame.
 
+## Run the conversion example
+
+Read the [example guidance](../examples/README.md) to run the conversion example from a checkout or an installed package. The example creates sample PCM data in memory and writes three output files under `resampler-example-output/` in the current directory. Use the first argument to name the output directory.
+
 ## Control output level
 
 Set `volume` to change the output level. A value of `0.5` halves the level. A value of `0` sets each output sample to `0`. A negative value changes signal polarity.

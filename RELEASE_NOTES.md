@@ -20,6 +20,7 @@
 
 ### Fixed
 
+- Added in-memory sample PCM data to the PCM conversion example. The example writes outputs to a documented directory.
 - Included cutoff and filter window values in filter coefficient cache keys.
 - Changed the benchmark to import the public package entry point and reject invalid frame, repeat, and chunk counts.
 - Corrected API and troubleshooting guidance to describe actual filter output length and stream behavior.
