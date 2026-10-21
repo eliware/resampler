@@ -23,7 +23,7 @@ A pure JavaScript, high-quality PCM audio resampler for Node.js. Converts s16le 
 
 ## Features
 
-Convert s16le PCM between sample rates. Convert mono input to stereo output or stereo input to mono output. Set output volume.
+Convert s16le PCM sample rates and channel layouts. Set output volume.
 
 ## Requirements
 
@@ -31,35 +31,35 @@ Use Node.js 26 or later. Supply signed 16-bit little-endian PCM data.
 
 ## Setup
 
-Install the package with `npm install @eliware/resampler`.
+Run `npm install @eliware/resampler` to install the package.
 
 ## Usage
 
-Create a `Resampler` stream. Pipe s16le PCM data through it. Read the [user guide](docs/usage.md) and [release notes](RELEASE_NOTES.md).
+Create a `Resampler` stream and pass PCM data through it. Read the [user guide](docs/usage.md), [documentation index](docs/README.md), and [release notes](RELEASE_NOTES.md).
 
 ## Development
 
-Use the [documentation index](docs/README.md), [specifications index](specs/README.md), and [examples index](examples/README.md).
+Read the [specifications index](specs/README.md) for repository requirements.
 
 ## Testing
 
-Run `npm test` for all checks. Run `npm run pack` to check package contents.
+Run `npm test` for aggregate validation.
 
 ## Troubleshooting
 
-Read the [troubleshooting guide](docs/troubleshooting.md) when output or validation fails.
+Read the [troubleshooting guide](docs/troubleshooting.md) for common problems.
 
 ## Security
 
-Validate untrusted file paths. Keep private audio out of logs and generated files.
+Do not add credentials or private data to logger metadata.
 
 ## API
 
-Read the [API guide](docs/api.md) for options, frame rules, channel maps, and output behavior.
+Read the [API guide](docs/api.md) for options and stream behavior.
 
 ## Packaging
 
-The package includes `src/`, `docs/`, `examples/`, and `specs/`. Read the [package guide](docs/usage.md#package-contents). Publish only after approved release steps.
+The package includes `src/`, `docs/`, `examples/`, and `specs/`. Run `npm run pack` to check package contents. Publish only after approved release steps.
 
 ## Examples
 
