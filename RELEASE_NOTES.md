@@ -1,5 +1,13 @@
 # Release Notes
 
+## 15.0.1 — 2026-10-26
+
+### Changed
+
+- Updated the package version to 15.0.1.
+- Updated `@eliware/log` and `@eliware/test` to 15.0.1.
+- Refreshed transitive dependency versions in the lockfile.
+
 ## 15.0.0 — 2026-10-21
 
 ### Changed
